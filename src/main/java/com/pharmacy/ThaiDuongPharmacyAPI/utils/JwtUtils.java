@@ -15,7 +15,7 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private static final long EXPIRE_DURATION = 24 * 60 * 60 * 1000;
+    private static final long EXPIRE_DURATION = 30 * 60 * 1000;
 
     private SecretKey getSecretKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);

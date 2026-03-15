@@ -1,9 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.LoginRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.RegisterRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.TokenRefreshRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.VerifyOtpRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AuthService;
 import jakarta.validation.Valid;
@@ -25,6 +22,25 @@ public class AuthController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @PostMapping("/change-password")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<ApiResponse<Object>> changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
+        ApiResponse<Object> response = authService.changePassword(request);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/forgot-password/request-otp")
+    public ResponseEntity<ApiResponse<Object>> requestForgotPasswordOtp(@Valid @RequestBody ForgotPasswordRequestDTO request) {
+        ApiResponse<Object> response = authService.forgotPassword(request);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/forgot-password/verify-otp")
+    public ResponseEntity<ApiResponse<Object>> verifyForgotPasswordOtp(@Valid @RequestBody ForgotPasswordVerifyOtpRequestDTO request) {
+        ApiResponse<Object> response = authService.resetPassword(request);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
     @PostMapping("/register/request-otp")
     public ResponseEntity<ApiResponse<Object>> requestOtp(@Valid @RequestBody RegisterRequestDTO request) {
         ApiResponse<Object> response = authService.requestOtp(request);
@@ -37,7 +53,7 @@ public class AuthController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<Object>> refreshToken(@Valid @RequestBody TokenRefreshRequestDTO request) {
         ApiResponse<Object> response = authService.refreshToken(request);
         return ResponseEntity.status(response.getStatus()).body(response);
