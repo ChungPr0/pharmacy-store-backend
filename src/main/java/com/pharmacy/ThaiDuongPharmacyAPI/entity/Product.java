@@ -36,7 +36,7 @@ public class Product {
     @Column(name = "is_best_seller")
     private Boolean isBestSeller = false;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
     private Boolean isActive = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
