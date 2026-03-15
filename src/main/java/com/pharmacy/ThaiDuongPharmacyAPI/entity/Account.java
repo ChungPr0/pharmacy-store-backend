@@ -11,11 +11,14 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    @Column(unique = true, nullable = false)
+    private String phone;
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "previous_password")
+    private String previousPassword;
 
     @Column(name = "role")
     private String role = "CUSTOMER";
