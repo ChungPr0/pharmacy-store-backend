@@ -43,5 +43,5 @@ jobs:
             cd /opt/pharmacy-api
             sudo docker build -t pharmacy-api-image .
             sudo docker rm -f pharmacy-api-container || true
-            sudo docker run -d -p 8080:8080 --name pharmacy-api-container --restart unless-stopped pharmacy-api-image
+            sudo docker run -d -p 8080:8080 --network pharmacy-net --name pharmacy-api-container --restart unless-stopped pharmacy-api-image
             sudo docker image prune -f
