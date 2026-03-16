@@ -1,0 +1,42 @@
+name: Deploy API to VPS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - run: mvn clean package -DskipTests
+      - run: mv target/*.jar target/app.jar
+
+      - uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "target/app.jar, Dockerfile"
+          target: "/opt/pharmacy-api"
+          strip_components: 1
+
+      - uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd /opt/pharmacy-api
+            sudo docker build -t pharmacy-api-image .
+            sudo docker rm -f pharmacy-api-container || true
+            sudo docker run -d -p 8080:8080 --name pharmacy-api-container --restart unless-stopped pharmacy-api-image
+            sudo docker image prune -f
