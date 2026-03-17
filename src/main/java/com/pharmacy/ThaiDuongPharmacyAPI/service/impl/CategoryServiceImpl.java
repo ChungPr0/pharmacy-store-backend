@@ -1,14 +1,18 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryHierarchyResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryTreeResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.SubCategoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CategoryRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,28 +21,45 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryTreeResponse> getCategoryTree() {
-        List<Category> rootCategories = categoryRepository.findByParentIsNull();
-        return rootCategories.stream()
+        return categoryRepository.findByParentIsNull().stream()
                 .map(this::mapToTreeResponse)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryHierarchyResponse getCategoryHierarchy(String slug) {
+        Category category = categoryRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với slug: " + slug));
+
+        List<SubCategoryResponse> children = (category.getChildren() == null || category.getChildren().isEmpty()) 
+                ? Collections.emptyList() 
+                : category.getChildren().stream()
+                    .map(child -> new SubCategoryResponse(child.getId(), child.getName(), child.getSlug()))
+                    .toList();
+
+        return new CategoryHierarchyResponse(
+                category.getId(),
+                category.getName(),
+                category.getSlug(),
+                children
+        );
     }
 
     private CategoryTreeResponse mapToTreeResponse(Category category) {
-        CategoryTreeResponse response = new CategoryTreeResponse();
-        response.setId(category.getId());
-        response.setName(category.getName());
-        response.setSlug(category.getSlug());
-
-        if (category.getChildren() != null && !category.getChildren().isEmpty()) {
-            List<CategoryTreeResponse> childrenResponse = category.getChildren().stream()
+        List<CategoryTreeResponse> childrenResponse = (category.getChildren() == null || category.getChildren().isEmpty())
+                ? Collections.emptyList()
+                : category.getChildren().stream()
                     .map(this::mapToTreeResponse)
-                    .collect(Collectors.toList());
-            response.setChildren(childrenResponse);
-        } else {
-            response.setChildren(List.of());
-        }
+                    .toList();
 
-        return response;
+        return new CategoryTreeResponse(
+                category.getId(),
+                category.getName(),
+                category.getSlug(),
+                childrenResponse
+        );
     }
 }
