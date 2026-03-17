@@ -21,8 +21,8 @@ public class ProductSearchRequestDTO {
     @Pattern(regexp = "^(price|createdAt|name)$", message = "Chỉ cho phép sort theo: price, createdAt, name")
     private String sortBy = "price";
 
-    @Pattern(regexp = "^(?i)(asc|desc)$", message = "Sort direction chỉ được là asc hoặc desc")
-    private String sortDir = "asc";
+    @Pattern(regexp = "^(ASC|DESC)$", message = "Sort direction chỉ được là ASC hoặc DESC")
+    private String sortDir = "ASC";
 
     private String keyword = "";
 }
