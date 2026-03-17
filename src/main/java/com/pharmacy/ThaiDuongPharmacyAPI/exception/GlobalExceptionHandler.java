@@ -38,6 +38,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        logger.warn("Resource not found: {}", ex.getMessage());
+        ApiResponse<Object> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "API không tồn tại hoặc đã bị xóa!", null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
         logger.error("Unhandled Exception: ", ex); // Log the full stack trace for internal debugging
