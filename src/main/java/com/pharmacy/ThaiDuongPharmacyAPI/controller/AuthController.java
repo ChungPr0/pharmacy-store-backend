@@ -39,18 +39,26 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Quên mật khẩu: Yêu cầu mã OTP", description = "Gửi một mã OTP về số điện thoại hoặc email của người dùng khi họ quên mật khẩu.")
+    @Operation(summary = "BƯỚC 1 - Quên mật khẩu: Yêu cầu mã OTP", description = "Kiểm tra số điện thoại có tồn tại không và gửi mã OTP 6 số (có hiệu lực 60s).")
     @PostMapping("/forgot-password/request-otp")
     public ResponseEntity<ApiResponse<OtpResponse>> requestForgotPasswordOtp(@Valid @RequestBody ForgotPasswordRequestDTO request) {
-        OtpResponse otpResponse = authService.forgotPassword(request);
+        OtpResponse otpResponse = authService.forgotPasswordRequestOtp(request);
         ApiResponse<OtpResponse> response = new ApiResponse<>(HttpStatus.OK.value(), "Mã OTP đã được gửi đến số điện thoại của bạn!", otpResponse);
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Quên mật khẩu: Xác thực OTP và đặt lại", description = "Xác nhận mã OTP hợp lệ và lưu mật khẩu mới cho người dùng.")
+    @Operation(summary = "BƯỚC 2 - Quên mật khẩu: Xác thực OTP", description = "Kiểm tra mã OTP xem có khớp và còn hạn không. (Lưu ý: Chưa reset mật khẩu ở bước này)")
     @PostMapping("/forgot-password/verify-otp")
     public ResponseEntity<ApiResponse<Object>> verifyForgotPasswordOtp(@Valid @RequestBody ForgotPasswordVerifyOtpRequestDTO request) {
-        authService.resetPassword(request);
+        authService.forgotPasswordVerifyOtp(request);
+        ApiResponse<Object> response = new ApiResponse<>(HttpStatus.OK.value(), "Mã OTP hợp lệ!", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "BƯỚC 3 - Quên mật khẩu: Đặt lại mật khẩu", description = "Kiểm tra lại OTP lần cuối, đổi mật khẩu mới và vô hiệu hóa OTP để không bị dùng lại.")
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<ApiResponse<Object>> resetPassword(@Valid @RequestBody ForgotPasswordResetRequestDTO request) {
+        authService.forgotPasswordReset(request);
         ApiResponse<Object> response = new ApiResponse<>(HttpStatus.OK.value(), "Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.", null);
         return ResponseEntity.ok(response);
     }
@@ -65,7 +73,7 @@ public class AuthController {
 
     @Operation(summary = "Đăng ký: Xác thực OTP", description = "Hoàn tất luồng đăng ký bằng cách cung cấp OTP đúng. Trả về thông tin đăng ký thành công.")
     @PostMapping("/register/verify-otp")
-    public ResponseEntity<ApiResponse<RegisterResponse>> verifyOtp(@Valid @RequestBody VerifyOtpRequestDTO request) {
+    public ResponseEntity<ApiResponse<RegisterResponse>> verifyOtp(@Valid @RequestBody RegisterVerifyOtpRequestDTO request) {
         RegisterResponse registerResponse = authService.verifyOtpAndRegister(request);
         ApiResponse<RegisterResponse> response = new ApiResponse<>(HttpStatus.CREATED.value(), "Đăng ký thành công! Vui lòng đăng nhập.", registerResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

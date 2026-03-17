@@ -85,7 +85,7 @@ public class AuthService {
         refreshTokenRepository.deleteByAccount(account);
     }
 
-    public OtpResponse forgotPassword(ForgotPasswordRequestDTO request) {
+    public OtpResponse forgotPasswordRequestOtp(ForgotPasswordRequestDTO request) {
         if (!accountRepository.existsByPhone(request.getPhone())) {
             throw new ApiException(404, "Số điện thoại này chưa được đăng ký!");
         }
@@ -94,15 +94,32 @@ public class AuthService {
         return new OtpResponse(request.getPhone(), OTP_EXPIRATION_SECONDS);
     }
 
-    public void resetPassword(ForgotPasswordVerifyOtpRequestDTO request) {
-        verifyOtp(request.getPhone(), request.getOtpCode());
+    public void forgotPasswordVerifyOtp(ForgotPasswordVerifyOtpRequestDTO request) {
+        Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
+                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
+
+        if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
+        }
+    }
+
+    public void forgotPasswordReset(ForgotPasswordResetRequestDTO request) {
+        Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
+                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
+
+        if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
+        }
 
         Account account = accountRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> new ApiException(404, "Tài khoản không tồn tại!"));
 
         account.setPreviousPassword(account.getPassword());
-        account.setPassword(passwordEncoder.encode(request.getPassword()));
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
         accountRepository.save(account);
+
+        validOtp.setIsUsed(true);
+        otpRepository.save(validOtp);
 
         refreshTokenRepository.deleteByAccount(account);
     }
@@ -116,12 +133,20 @@ public class AuthService {
         return new OtpResponse(request.getPhone(), OTP_EXPIRATION_SECONDS);
     }
 
-    public RegisterResponse verifyOtpAndRegister(VerifyOtpRequestDTO request) {
+    public RegisterResponse verifyOtpAndRegister(RegisterVerifyOtpRequestDTO request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
             throw new ApiException(400, "Số điện thoại này đã được đăng ký!");
         }
 
-        verifyOtp(request.getPhone(), request.getOtpCode());
+        Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
+                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
+
+        if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
+        }
+
+        validOtp.setIsUsed(true);
+        otpRepository.save(validOtp);
 
         Customer newCustomer = getNewCustomer(request);
         customerRepository.save(newCustomer);
@@ -144,19 +169,7 @@ public class AuthService {
         System.out.println("=========================================");
     }
 
-    private void verifyOtp(String phone, String otpCode) {
-        Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(phone, otpCode)
-                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
-
-        if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
-        }
-
-        validOtp.setIsUsed(true);
-        otpRepository.save(validOtp);
-    }
-
-    private Customer getNewCustomer(VerifyOtpRequestDTO request) {
+    private Customer getNewCustomer(RegisterVerifyOtpRequestDTO request) {
         Account newAccount = new Account();
         newAccount.setPhone(request.getPhone());
         newAccount.setPassword(passwordEncoder.encode(request.getPassword()));
