@@ -27,8 +27,6 @@ public class RegisterVerifyOtpRequestDTO {
     @Email(message = "Email không đúng định dạng")
     private String email;
 
-    private String address;
-
     @NotBlank(message = "Vui lòng chọn giới tính")
     @Pattern(regexp = "^(MALE|FEMALE|OTHER)$", message = "Giới tính không hợp lệ")
     private String gender;

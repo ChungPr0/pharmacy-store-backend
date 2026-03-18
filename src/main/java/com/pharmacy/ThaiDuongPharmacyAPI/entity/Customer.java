@@ -2,6 +2,11 @@ package com.pharmacy.ThaiDuongPharmacyAPI.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -11,8 +16,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "account_id", unique = true, nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Account account;
 
     @Column(name = "full_name")
@@ -23,9 +30,6 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "address")
-    private String address;
-
     @Column(name = "gender")
     private String gender;
 
@@ -34,4 +38,9 @@ public class Customer {
 
     @Column(name = "customer_type")
     private String customerType = "Đồng";
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<CustomerAddress> addresses = new ArrayList<>();
 }

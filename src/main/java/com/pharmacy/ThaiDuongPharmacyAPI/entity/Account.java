@@ -2,6 +2,8 @@ package com.pharmacy.ThaiDuongPharmacyAPI.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
@@ -25,4 +27,9 @@ public class Account {
 
     @Column(name = "status")
     private String status = "ACTIVE";
+
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Customer customer;
 }

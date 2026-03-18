@@ -179,7 +179,6 @@ public class AuthService {
         newCustomer.setFullName(request.getFullName());
         newCustomer.setPhone(request.getPhone());
         newCustomer.setEmail(request.getEmail());
-        newCustomer.setAddress(request.getAddress());
         newCustomer.setGender(request.getGender());
         return newCustomer;
     }
