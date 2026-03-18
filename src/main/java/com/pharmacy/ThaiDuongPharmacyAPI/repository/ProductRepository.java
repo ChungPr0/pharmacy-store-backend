@@ -1,5 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.repository;
 
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductListResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductSearchResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.RelatedProductResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
@@ -57,6 +58,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySlugWithDetails(@Param("slug") String slug);
 
     @Query("SELECT p FROM Product p " +
+           "LEFT JOIN FETCH p.category " +
+           "LEFT JOIN FETCH p.images " +
+           "WHERE p.slug = :slug")
+    Optional<Product> findAdminBySlugWithDetails(@Param("slug") String slug);
+
+    @Query("SELECT p FROM Product p " +
            "LEFT JOIN FETCH p.attributes " +
            "WHERE p.id = :productId")
     Optional<Product> findProductAttributesById(@Param("productId") Long productId);
@@ -73,5 +80,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<RelatedProductResponse> findRelatedProducts(
             @Param("categoryId") Long categoryId,
             @Param("excludeProductId") Long excludeProductId,
+            Pageable pageable);
+            
+    boolean existsByCategoryId(Long categoryId);
+
+    boolean existsBySlug(String slug);
+
+    Optional<Product> findBySlug(String slug);
+
+    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductListResponse(" +
+           "p.id, p.name, p.slug, p.category.name, p.price, p.isActive, COALESCE(SUM(pb.stockQuantity), 0L)) " +
+           "FROM Product p " +
+           "LEFT JOIN p.batches pb " +
+           "WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND (:categorySlug IS NULL OR :categorySlug = '' OR p.category.slug = :categorySlug) " +
+           "GROUP BY p.id, p.name, p.slug, p.category.name, p.price, p.isActive")
+    Page<AdminProductListResponse> getAdminProductList(
+            @Param("keyword") String keyword,
+            @Param("categorySlug") String categorySlug,
             Pageable pageable);
 }
