@@ -2,13 +2,11 @@ package com.pharmacy.ThaiDuongPharmacyAPI.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
 public class ProductSearchRequestDTO {
-    @NotBlank(message = "Category slug không được để trống")
     private String categorySlug;
 
     @Min(value = 0, message = "Trang (pageNo) phải bắt đầu từ 0")

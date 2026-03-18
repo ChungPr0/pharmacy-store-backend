@@ -53,20 +53,29 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PagedResponse<ProductSearchResponse> searchProducts(ProductSearchRequestDTO request) {
-        Category category = categoryRepository.findBySlug(request.getCategorySlug())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với slug: " + request.getCategorySlug()));
-
-        List<Long> categoryIds = new ArrayList<>();
-        collectCategoryIds(category, categoryIds);
-
         Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDir()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPageNo(), request.getPageSize(), sort);
 
-        Page<ProductSearchResponse> productPage = productRepository.searchProductsByCategoryIds(
-                categoryIds,
-                request.getKeyword(),
-                pageable
-        );
+        Page<ProductSearchResponse> productPage;
+
+        if (request.getCategorySlug() == null || request.getCategorySlug().trim().isEmpty()) {
+            productPage = productRepository.searchProductsGloballyByKeyword(
+                    request.getKeyword(),
+                    pageable
+            );
+        } else {
+            Category category = categoryRepository.findBySlug(request.getCategorySlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với slug: " + request.getCategorySlug()));
+
+            List<Long> categoryIds = new ArrayList<>();
+            collectCategoryIds(category, categoryIds);
+
+            productPage = productRepository.searchProductsByCategoryIdsAndKeyword(
+                    categoryIds,
+                    request.getKeyword(),
+                    pageable
+            );
+        }
 
         return new PagedResponse<>(
                 productPage.getContent(),

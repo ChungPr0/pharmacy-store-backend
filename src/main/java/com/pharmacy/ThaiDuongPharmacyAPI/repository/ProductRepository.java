@@ -34,8 +34,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            "AND p.isActive = true " +
            "AND (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
            "GROUP BY p.id, p.name, p.slug, p.imageUrl, p.price, p.isBestSeller")
-    Page<ProductSearchResponse> searchProductsByCategoryIds(
+    Page<ProductSearchResponse> searchProductsByCategoryIdsAndKeyword(
             @Param("categoryIds") List<Long> categoryIds,
+            @Param("keyword") String keyword,
+            Pageable pageable);
+
+    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductSearchResponse(" +
+           "p.id, p.name, p.slug, p.imageUrl, p.price, p.isBestSeller, COALESCE(SUM(pb.stockQuantity), 0L)) " +
+           "FROM Product p " +
+           "LEFT JOIN p.batches pb " +
+           "WHERE p.isActive = true " +
+           "AND (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "GROUP BY p.id, p.name, p.slug, p.imageUrl, p.price, p.isBestSeller")
+    Page<ProductSearchResponse> searchProductsGloballyByKeyword(
             @Param("keyword") String keyword,
             Pageable pageable);
 
