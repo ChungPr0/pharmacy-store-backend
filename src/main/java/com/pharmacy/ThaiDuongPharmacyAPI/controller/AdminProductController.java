@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +36,7 @@ public class AdminProductController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "categorySlug", required = false) String categorySlug
     ) {
-        PagedResponse<AdminProductListResponse> responseData = adminProductService.getProductList(pageNo, pageSize, keyword, categorySlug);
-        ApiResponse<PagedResponse<AdminProductListResponse>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Lấy danh sách sản phẩm thành công",
-                responseData
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Lấy danh sách sản phẩm thành công", adminProductService.getProductList(pageNo, pageSize, keyword, categorySlug));
     }
 
     @Operation(summary = "Tạo sản phẩm mới", description = "Tạo sản phẩm mới bao gồm các thuộc tính và hình ảnh. Trả về id và slug.")
@@ -51,13 +44,7 @@ public class AdminProductController {
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> createProduct(
             @Valid @RequestBody AdminProductRequestDTO request) {
-        Map<String, Object> responseData = adminProductService.createProduct(request);
-        ApiResponse<Map<String, Object>> response = new ApiResponse<>(
-                HttpStatus.CREATED.value(),
-                "Tạo sản phẩm thành công",
-                responseData
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ApiResponse.created("Tạo sản phẩm thành công", adminProductService.createProduct(request));
     }
 
     @Operation(summary = "Lấy chi tiết sản phẩm", description = "Lấy thông tin chi tiết của một sản phẩm dựa trên slug, bao gồm cả hình ảnh và thuộc tính.")
@@ -65,13 +52,7 @@ public class AdminProductController {
     @GetMapping("/{slug}")
     public ResponseEntity<ApiResponse<AdminProductDetailResponse>> getProductDetail(
             @PathVariable String slug) {
-        AdminProductDetailResponse responseData = adminProductService.getProductDetail(slug);
-        ApiResponse<AdminProductDetailResponse> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Lấy chi tiết sản phẩm thành công",
-                responseData
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Lấy chi tiết sản phẩm thành công", adminProductService.getProductDetail(slug));
     }
 
     @Operation(summary = "Cập nhật sản phẩm", description = "Cập nhật thông tin chi tiết của một sản phẩm dựa trên slug. Trả về slug mới (nếu có thay đổi).")
@@ -80,13 +61,7 @@ public class AdminProductController {
     public ResponseEntity<ApiResponse<Map<String, String>>> updateProduct(
             @PathVariable String slug,
             @Valid @RequestBody AdminProductRequestDTO request) {
-        Map<String, String> responseData = adminProductService.updateProduct(slug, request);
-        ApiResponse<Map<String, String>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Cập nhật sản phẩm thành công",
-                responseData
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Cập nhật sản phẩm thành công", adminProductService.updateProduct(slug, request));
     }
 
     @Operation(summary = "Cập nhật trạng thái sản phẩm", description = "Bật/tắt trạng thái (is_active) của sản phẩm dựa trên slug.")
@@ -95,11 +70,6 @@ public class AdminProductController {
     public ResponseEntity<ApiResponse<Object>> toggleProductStatus(
             @PathVariable String slug) {
         adminProductService.toggleProductStatus(slug);
-        ApiResponse<Object> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Cập nhật trạng thái sản phẩm thành công",
-                null
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Cập nhật trạng thái sản phẩm thành công");
     }
 }

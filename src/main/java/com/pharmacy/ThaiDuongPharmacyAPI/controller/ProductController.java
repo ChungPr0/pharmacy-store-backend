@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,51 +25,27 @@ public class ProductController {
     @GetMapping("/best-sellers")
     public ResponseEntity<ApiResponse<PagedResponse<ProductCardResponse>>> getBestSellers(
             @RequestParam(defaultValue = "10") int limit) {
-        PagedResponse<ProductCardResponse> products = productService.getValidBestSellers(limit);
-        ApiResponse<PagedResponse<ProductCardResponse>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Lấy danh sách sản phẩm thành công",
-                products
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Lấy danh sách sản phẩm thành công", productService.getValidBestSellers(limit));
     }
 
     @Operation(summary = "Lấy danh sách Sản phẩm Mới nhất", description = "Trả về danh sách các sản phẩm mới thêm vào hệ thống gần đây nhất.")
     @GetMapping("/latest")
     public ResponseEntity<ApiResponse<PagedResponse<ProductCardResponse>>> getLatestProducts(
             @RequestParam(defaultValue = "10") int limit) {
-        PagedResponse<ProductCardResponse> products = productService.getValidLatestProducts(limit);
-        ApiResponse<PagedResponse<ProductCardResponse>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Lấy danh sách sản phẩm thành công",
-                products
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Lấy danh sách sản phẩm thành công", productService.getValidLatestProducts(limit));
     }
 
     @Operation(summary = "Tìm kiếm & Lọc Sản phẩm", description = "API đa năng để lọc theo danh mục, tìm kiếm theo từ khoá, phân trang và sắp xếp.")
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<PagedResponse<ProductSearchResponse>>> searchProducts(
             @Valid @RequestBody ProductSearchRequestDTO request) {
-        PagedResponse<ProductSearchResponse> products = productService.searchProducts(request);
-        ApiResponse<PagedResponse<ProductSearchResponse>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Tìm kiếm sản phẩm thành công",
-                products
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Tìm kiếm sản phẩm thành công", productService.searchProducts(request));
     }
 
     @Operation(summary = "Lấy Chi tiết một Sản phẩm", description = "Trả về toàn bộ thông tin chi tiết của một sản phẩm bao gồm ảnh, thuộc tính và tồn kho dựa trên Slug.")
     @GetMapping("/{slug}")
     public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductDetail(@PathVariable String slug) {
-        ProductDetailResponse productDetail = productService.getProductDetail(slug);
-        ApiResponse<ProductDetailResponse> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Lấy chi tiết sản phẩm thành công",
-                productDetail
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Lấy chi tiết sản phẩm thành công", productService.getProductDetail(slug));
     }
 
     @Operation(summary = "Lấy danh sách Sản phẩm Liên quan", description = "Lấy danh sách các sản phẩm cùng danh mục để gợi ý cho người dùng.")
@@ -78,12 +53,6 @@ public class ProductController {
     public ResponseEntity<ApiResponse<List<RelatedProductResponse>>> getRelatedProducts(
             @PathVariable String slug,
             @RequestParam(defaultValue = "5") int limit) {
-        List<RelatedProductResponse> relatedProducts = productService.getRelatedProducts(slug, limit);
-        ApiResponse<List<RelatedProductResponse>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "Lấy sản phẩm liên quan thành công",
-                relatedProducts
-        );
-        return ResponseEntity.ok(response);
+        return ApiResponse.success("Lấy sản phẩm liên quan thành công", productService.getRelatedProducts(slug, limit));
     }
 }

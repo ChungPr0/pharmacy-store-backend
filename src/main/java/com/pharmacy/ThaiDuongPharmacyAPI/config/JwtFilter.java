@@ -1,6 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pharmacy.ThaiDuongPharmacyAPI.entity.Account;
+import com.pharmacy.ThaiDuongPharmacyAPI.repository.AccountRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -16,13 +20,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+    private final AccountRepository accountRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -47,11 +54,27 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (phone != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtils.validateToken(token)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        phone, null, new ArrayList<>()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                // Fetch the user from the database to get their role
+                Optional<Account> accountOpt = accountRepository.findByPhone(phone);
+                
+                if (accountOpt.isPresent()) {
+                    Account account = accountOpt.get();
+                    
+                    // Create authorities based on the role
+                    List<GrantedAuthority> authorities = new ArrayList<>();
+                    // Make sure the role has the "ROLE_" prefix which Spring Security expects for hasRole()
+                    String role = account.getRole().startsWith("ROLE_") ? account.getRole() : "ROLE_" + account.getRole();
+                    authorities.add(new SimpleGrantedAuthority(role));
+
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            phone, null, authorities
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    sendErrorResponse(response, "Tài khoản không tồn tại!");
+                    return;
+                }
             } else {
                 sendErrorResponse(response, "Từ chối truy cập!");
                 return;

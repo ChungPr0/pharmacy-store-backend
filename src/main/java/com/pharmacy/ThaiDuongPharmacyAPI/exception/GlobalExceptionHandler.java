@@ -21,15 +21,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiResponse<Object>> handleApiException(ApiException ex) {
         logger.warn("API Exception: Status[{}], Message[{}]", ex.getStatus(), ex.getMessage());
-        ApiResponse<Object> response = new ApiResponse<>(ex.getStatus(), ex.getMessage(), null);
-        return ResponseEntity.status(ex.getStatus()).body(response);
+        return ApiResponse.error(ex.getStatus(), ex.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Object>> handleBadRequestException(BadRequestException ex) {
         logger.warn("Bad Request: {}", ex.getMessage());
-        ApiResponse<Object> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -41,21 +39,18 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         logger.warn("Validation errors: {}", errors);
-        ApiResponse<Object> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Dữ liệu không hợp lệ", errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Dữ liệu không hợp lệ", errors);
     }
 
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException ex) {
         logger.warn("Resource not found: {}", ex.getMessage());
-        ApiResponse<Object> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "API không tồn tại hoặc đã bị xóa!", null);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return ApiResponse.error(HttpStatus.NOT_FOUND.value(), "API không tồn tại hoặc đã bị xóa!");
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
         logger.error("Unhandled Exception: ", ex); // Log the full stack trace for internal debugging
-        ApiResponse<Object> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Đã xảy ra lỗi máy chủ nội bộ!", null);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Đã xảy ra lỗi máy chủ nội bộ!");
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -45,8 +47,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Cấu hình OPTIONS cho CORS preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        // 2. Swagger UI & API Docs (chỉ nên mở ở môi trường DEV/Test, nhưng tạm thời mở public)
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                        // 3. Auth APIs (Public)
                         .requestMatchers(
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/register/**",
@@ -54,16 +61,18 @@ public class SecurityConfig {
                                 "/api/v1/auth/forgot-password/**"
                         ).permitAll()
 
-                        .requestMatchers("/error").permitAll()
-
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-
+                        // 4. Public Data APIs (Categories, Products)
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/products/search").permitAll()
 
-                        .requestMatchers("/api/v1/auth/change-password").authenticated()
+                        // 5. Spring Boot Error Page
+                        .requestMatchers("/error").permitAll()
 
+                        // 6. Admin APIs (Bảo vệ toàn bộ thư mục admin, bổ sung thêm bảo vệ từ filter nếu cần)
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 7. Mọi request còn lại yêu cầu phải đăng nhập
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -76,13 +85,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(List.of("*"));
-
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token", "Accept"));
-
         configuration.setAllowCredentials(true);
-
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
