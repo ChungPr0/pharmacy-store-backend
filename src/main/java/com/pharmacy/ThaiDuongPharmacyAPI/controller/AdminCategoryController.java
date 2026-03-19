@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.request.CategoryRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.request.CategoryRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CategoryService;
@@ -36,7 +36,7 @@ public class AdminCategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<CategoryTreeResponse>> createCategory(
-            @Valid @RequestBody CategoryRequestDTO request) {
+            @Valid @RequestBody CategoryRequest request) {
         return ApiResponse.created("Tạo danh mục thành công", categoryService.createCategory(request));
     }
 
@@ -45,7 +45,7 @@ public class AdminCategoryController {
     @PutMapping("/{slug}")
     public ResponseEntity<ApiResponse<CategoryTreeResponse>> updateCategory(
             @PathVariable String slug,
-            @Valid @RequestBody CategoryRequestDTO request) {
+            @Valid @RequestBody CategoryRequest request) {
         return ApiResponse.success("Cập nhật danh mục thành công", categoryService.updateCategory(slug, request));
     }
 

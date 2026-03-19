@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductCardResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductDetailResponse;
@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProductService {
     PagedResponse<ProductCardResponse> getValidBestSellers(int limit);
     PagedResponse<ProductCardResponse> getValidLatestProducts(int limit);
-    PagedResponse<ProductSearchResponse> searchProducts(ProductSearchRequestDTO request);
+    PagedResponse<ProductSearchResponse> searchProducts(ProductSearchRequest request);
     ProductDetailResponse getProductDetail(String slug);
     List<RelatedProductResponse> getRelatedProducts(String slug, int limit);
 }

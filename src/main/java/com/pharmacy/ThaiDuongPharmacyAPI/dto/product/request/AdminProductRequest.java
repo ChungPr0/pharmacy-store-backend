@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminProductRequestDTO {
+public class AdminProductRequest {
 
     @NotBlank(message = "Tên sản phẩm không được để trống")
     private String name;

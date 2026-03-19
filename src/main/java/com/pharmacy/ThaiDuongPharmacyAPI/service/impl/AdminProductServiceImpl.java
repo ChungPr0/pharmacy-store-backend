@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
@@ -52,7 +52,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     @Override
     @Transactional
-    public Map<String, Object> createProduct(AdminProductRequestDTO request) {
+    public Map<String, Object> createProduct(AdminProductRequest request) {
         String slug = SlugUtils.toSlug(request.getName());
         if (productRepository.existsBySlug(slug)) {
             throw new BadRequestException("Tên sản phẩm đã tồn tại!");
@@ -80,7 +80,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         if (request.getAttributes() != null) {
-            for (AdminProductRequestDTO.ProductAttributeRequestDTO attrDto : request.getAttributes()) {
+            for (AdminProductRequest.ProductAttributeRequestDTO attrDto : request.getAttributes()) {
                 ProductAttribute attr = new ProductAttribute();
                 attr.setAttributeName(attrDto.getName());
                 attr.setAttributeValue(attrDto.getValue());
@@ -113,7 +113,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     @Override
     @Transactional
-    public Map<String, String> updateProduct(String slug, AdminProductRequestDTO request) {
+    public Map<String, String> updateProduct(String slug, AdminProductRequest request) {
         Product product = productRepository.findAdminBySlugWithDetails(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
 
@@ -149,7 +149,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         product.getAttributes().clear();
         if (request.getAttributes() != null) {
-            for (AdminProductRequestDTO.ProductAttributeRequestDTO attrDto : request.getAttributes()) {
+            for (AdminProductRequest.ProductAttributeRequestDTO attrDto : request.getAttributes()) {
                 ProductAttribute attr = new ProductAttribute();
                 attr.setAttributeName(attrDto.getName());
                 attr.setAttributeValue(attrDto.getValue());

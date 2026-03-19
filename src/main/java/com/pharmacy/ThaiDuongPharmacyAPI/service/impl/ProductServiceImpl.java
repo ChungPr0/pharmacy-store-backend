@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<ProductSearchResponse> searchProducts(ProductSearchRequestDTO request) {
+    public PagedResponse<ProductSearchResponse> searchProducts(ProductSearchRequest request) {
         Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDir()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPageNo(), request.getPageSize(), sort);
 
@@ -104,10 +104,10 @@ public class ProductServiceImpl implements ProductService {
                 .map(ProductImage::getImageUrl)
                 .toList();
 
-        List<ProductAttributeDTO> attributes = Optional.ofNullable(productWithAttributes.getAttributes())
+        List<ProductAttribute> attributes = Optional.ofNullable(productWithAttributes.getAttributes())
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(attr -> new ProductAttributeDTO(attr.getAttributeName(), attr.getAttributeValue()))
+                .map(attr -> new ProductAttribute(attr.getAttributeName(), attr.getAttributeValue()))
                 .toList();
 
         return new ProductDetailResponse(

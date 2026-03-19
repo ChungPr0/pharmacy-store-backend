@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
@@ -43,7 +43,7 @@ public class AdminProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> createProduct(
-            @Valid @RequestBody AdminProductRequestDTO request) {
+            @Valid @RequestBody AdminProductRequest request) {
         return ApiResponse.created("Tạo sản phẩm thành công", adminProductService.createProduct(request));
     }
 
@@ -60,7 +60,7 @@ public class AdminProductController {
     @PutMapping("/{slug}")
     public ResponseEntity<ApiResponse<Map<String, String>>> updateProduct(
             @PathVariable String slug,
-            @Valid @RequestBody AdminProductRequestDTO request) {
+            @Valid @RequestBody AdminProductRequest request) {
         return ApiResponse.success("Cập nhật sản phẩm thành công", adminProductService.updateProduct(slug, request));
     }
 

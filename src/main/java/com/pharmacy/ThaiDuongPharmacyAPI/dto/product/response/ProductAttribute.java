@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductAttributeDTO {
+public class ProductAttribute {
     private String name;
     private String value;
 }

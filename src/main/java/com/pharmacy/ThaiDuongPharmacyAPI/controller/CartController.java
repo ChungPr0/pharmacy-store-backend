@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.CartItemRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.UpdateCartItemRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.CartItemRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.UpdateCartItemRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.response.CartInfoResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CartService;
@@ -34,7 +34,7 @@ public class CartController {
     @Operation(summary = "Thêm sản phẩm vào giỏ hàng", description = "Thêm một sản phẩm mới hoặc tăng số lượng nếu sản phẩm đã có trong giỏ.")
     @PostMapping("/items")
     public ResponseEntity<ApiResponse<Object>> addProductToCart(
-            @Valid @RequestBody CartItemRequestDTO request) {
+            @Valid @RequestBody CartItemRequest request) {
         cartService.addProductToCart(request);
         return ApiResponse.success("Đã thêm sản phẩm vào giỏ hàng");
     }
@@ -42,7 +42,7 @@ public class CartController {
     @Operation(summary = "Cập nhật số lượng sản phẩm", description = "Cập nhật chính xác số lượng của một sản phẩm trong giỏ. Nếu số lượng <= 0, sản phẩm sẽ bị xóa khỏi giỏ.")
     @PutMapping("/items")
     public ResponseEntity<ApiResponse<Object>> updateCartItemQuantity(
-            @Valid @RequestBody UpdateCartItemRequestDTO request) {
+            @Valid @RequestBody UpdateCartItemRequest request) {
         cartService.updateCartItemQuantity(request);
         return ApiResponse.success("Cập nhật số lượng thành công");
     }

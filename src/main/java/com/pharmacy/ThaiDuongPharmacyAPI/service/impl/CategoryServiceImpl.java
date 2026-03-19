@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.request.CategoryRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.request.CategoryRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryHierarchyResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.SubCategoryResponse;
@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryTreeResponse createCategory(CategoryRequestDTO request) {
+    public CategoryTreeResponse createCategory(CategoryRequest request) {
         String slug = SlugUtils.toSlug(request.getName());
         if (categoryRepository.existsBySlug(slug)) {
             throw new BadRequestException("Tên danh mục đã tồn tại!");
@@ -83,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryTreeResponse updateCategory(String slug, CategoryRequestDTO request) {
+    public CategoryTreeResponse updateCategory(String slug, CategoryRequest request) {
         Category category = categoryRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
 

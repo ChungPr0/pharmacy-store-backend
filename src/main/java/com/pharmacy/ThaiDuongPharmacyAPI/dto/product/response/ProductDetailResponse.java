@@ -19,7 +19,7 @@ public class ProductDetailResponse {
     private String categoryName;
     private String categorySlug;
     private List<String> images;
-    private List<ProductAttributeDTO> attributes;
+    private List<ProductAttribute> attributes;
     private String description;
     private Boolean isBestSeller;
 }

@@ -35,7 +35,7 @@ public class AuthService {
 
     private static final int OTP_EXPIRATION_SECONDS = 60;
 
-    public LoginResponse login(LoginRequestDTO request) {
+    public LoginResponse login(LoginRequest request) {
         Account account = accountRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> new ApiException(401, "Số điện thoại hoặc mật khẩu không chính xác!"));
 
@@ -56,7 +56,7 @@ public class AuthService {
         );
     }
 
-    public void changePassword(ChangePasswordRequestDTO request) {
+    public void changePassword(ChangePasswordRequest request) {
         String currentPhone = (String) org.springframework.security.core.context.SecurityContextHolder
                 .getContext().getAuthentication().getPrincipal();
 
@@ -82,7 +82,7 @@ public class AuthService {
         refreshTokenRepository.deleteByAccount(account);
     }
 
-    public OtpResponse forgotPasswordRequestOtp(ForgotPasswordRequestDTO request) {
+    public OtpResponse forgotPasswordRequestOtp(ForgotPasswordRequest request) {
         if (!accountRepository.existsByPhone(request.getPhone())) {
             throw new ApiException(404, "Số điện thoại này chưa được đăng ký!");
         }
@@ -91,7 +91,7 @@ public class AuthService {
         return new OtpResponse(request.getPhone(), OTP_EXPIRATION_SECONDS);
     }
 
-    public void forgotPasswordVerifyOtp(ForgotPasswordVerifyOtpRequestDTO request) {
+    public void forgotPasswordVerifyOtp(ForgotPasswordVerifyOtpRequest request) {
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
                 .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
 
@@ -100,7 +100,7 @@ public class AuthService {
         }
     }
 
-    public void forgotPasswordReset(ForgotPasswordResetRequestDTO request) {
+    public void forgotPasswordReset(ForgotPasswordResetRequest request) {
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
                 .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
 
@@ -121,7 +121,7 @@ public class AuthService {
         refreshTokenRepository.deleteByAccount(account);
     }
 
-    public OtpResponse requestOtp(RegisterRequestDTO request) {
+    public OtpResponse requestOtp(RegisterRequest request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
             throw new ApiException(400, "Số điện thoại này đã được đăng ký!");
         }
@@ -130,7 +130,7 @@ public class AuthService {
         return new OtpResponse(request.getPhone(), OTP_EXPIRATION_SECONDS);
     }
 
-    public RegisterResponse verifyOtpAndRegister(RegisterVerifyOtpRequestDTO request) {
+    public RegisterResponse verifyOtpAndRegister(RegisterVerifyOtpRequest request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
             throw new ApiException(400, "Số điện thoại này đã được đăng ký!");
         }
@@ -166,7 +166,7 @@ public class AuthService {
         System.out.println("=========================================");
     }
 
-    private Customer getNewCustomer(RegisterVerifyOtpRequestDTO request) {
+    private Customer getNewCustomer(RegisterVerifyOtpRequest request) {
         Account newAccount = new Account();
         newAccount.setPhone(request.getPhone());
         newAccount.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -191,7 +191,7 @@ public class AuthService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public TokenRefreshResponse refreshToken(TokenRefreshRequestDTO request) {
+    public TokenRefreshResponse refreshToken(TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(requestRefreshToken)

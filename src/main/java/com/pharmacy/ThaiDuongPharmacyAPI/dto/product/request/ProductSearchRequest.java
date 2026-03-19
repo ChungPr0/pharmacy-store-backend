@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class ProductSearchRequestDTO {
+public class ProductSearchRequest {
     private String categorySlug;
 
     @Min(value = 0, message = "Trang (pageNo) phải bắt đầu từ 0")

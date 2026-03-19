@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class AddressRequestDTO {
+public class AddressRequest {
     @NotBlank(message = "Tên người nhận không được để trống")
     private String receiverName;
 

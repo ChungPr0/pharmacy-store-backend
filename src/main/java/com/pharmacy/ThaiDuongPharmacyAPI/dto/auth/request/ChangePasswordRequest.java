@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ChangePasswordRequestDTO {
+public class ChangePasswordRequest {
     @NotBlank(message = "Mật khẩu hiện tại không được để trống")
     private String oldPassword;
 

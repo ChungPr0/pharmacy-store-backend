@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.request.AddressRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.request.AddressRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.response.AddressResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CustomerAddressService;
@@ -34,7 +34,7 @@ public class CustomerAddressController {
 
     @Operation(summary = "Thêm mới địa chỉ", description = "Thêm một địa chỉ mới vào sổ địa chỉ. Nếu là địa chỉ đầu tiên, tự động thành mặc định.")
     @PostMapping
-    public ResponseEntity<ApiResponse<AddressResponse>> createAddress(@Valid @RequestBody AddressRequestDTO requestDTO) {
+    public ResponseEntity<ApiResponse<AddressResponse>> createAddress(@Valid @RequestBody AddressRequest requestDTO) {
         return ApiResponse.created("Thêm mới địa chỉ thành công", addressService.createAddress(requestDTO));
     }
 
@@ -42,7 +42,7 @@ public class CustomerAddressController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<AddressResponse>> updateAddress(
             @PathVariable Long id,
-            @Valid @RequestBody AddressRequestDTO requestDTO) {
+            @Valid @RequestBody AddressRequest requestDTO) {
         return ApiResponse.success("Cập nhật địa chỉ thành công", addressService.updateAddress(id, requestDTO));
     }
 

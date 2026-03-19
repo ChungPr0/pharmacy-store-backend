@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class TokenRefreshRequestDTO {
+public class TokenRefreshRequest {
     @NotBlank(message = "Refresh Token không được để trống!")
     private String refreshToken;
 }

@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.CartItemRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.UpdateCartItemRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.CartItemRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.UpdateCartItemRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.response.CartInfoResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.response.CartItemResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Cart;
@@ -82,7 +82,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void addProductToCart(CartItemRequestDTO request) {
+    public void addProductToCart(CartItemRequest request) {
         Customer currentCustomer = authUtils.getCurrentCustomer();
         
         Cart cart = cartRepository.findByCustomerId(currentCustomer.getId())
@@ -116,7 +116,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void updateCartItemQuantity(UpdateCartItemRequestDTO request) {
+    public void updateCartItemQuantity(UpdateCartItemRequest request) {
         Long customerId = authUtils.getCurrentCustomerId();
         Cart cart = cartRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new ApiException(404, "Giỏ hàng trống!"));

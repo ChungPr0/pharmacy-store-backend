@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RegisterVerifyOtpRequestDTO {
+public class RegisterVerifyOtpRequest {
 
     @NotBlank(message = "Số điện thoại không được để trống")
     @Pattern(regexp = "^(0|\\+84)[0-9]{8,9}$", message = "Số điện thoại không hợp lệ")

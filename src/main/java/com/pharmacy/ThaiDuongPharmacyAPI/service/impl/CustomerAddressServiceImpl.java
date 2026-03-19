@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.request.AddressRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.request.AddressRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.response.AddressResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.CustomerAddress;
@@ -34,7 +34,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
     @Override
     @Transactional
-    public AddressResponse createAddress(AddressRequestDTO requestDTO) {
+    public AddressResponse createAddress(AddressRequest requestDTO) {
         Customer currentCustomer = authUtils.getCurrentCustomer();
         Long customerId = currentCustomer.getId();
 
@@ -58,7 +58,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
     @Override
     @Transactional
-    public AddressResponse updateAddress(Long id, AddressRequestDTO requestDTO) {
+    public AddressResponse updateAddress(Long id, AddressRequest requestDTO) {
         Long customerId = authUtils.getCurrentCustomerId();
         CustomerAddress address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy địa chỉ"));
@@ -139,7 +139,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         addressRepository.save(address);
     }
 
-    private void mapRequestToEntity(AddressRequestDTO requestDTO, CustomerAddress address) {
+    private void mapRequestToEntity(AddressRequest requestDTO, CustomerAddress address) {
         address.setReceiverName(requestDTO.getReceiverName());
         address.setPhoneNumber(requestDTO.getPhoneNumber());
         address.setProvince(requestDTO.getProvince());

@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public class ProductController {
     @Operation(summary = "Tìm kiếm & Lọc Sản phẩm", description = "API đa năng để lọc theo danh mục, tìm kiếm theo từ khoá, phân trang và sắp xếp.")
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<PagedResponse<ProductSearchResponse>>> searchProducts(
-            @Valid @RequestBody ProductSearchRequestDTO request) {
+            @Valid @RequestBody ProductSearchRequest request) {
         return ApiResponse.success("Tìm kiếm sản phẩm thành công", productService.searchProducts(request));
     }
 
