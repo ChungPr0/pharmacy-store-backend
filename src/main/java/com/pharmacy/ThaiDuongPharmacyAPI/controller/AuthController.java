@@ -1,7 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.*;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.*;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.auth.request.*;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.auth.response.*;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

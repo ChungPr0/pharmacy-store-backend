@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.ProductSearchRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.*;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductImage;

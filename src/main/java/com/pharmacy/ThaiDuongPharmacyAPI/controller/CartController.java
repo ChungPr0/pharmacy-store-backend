@@ -1,9 +1,9 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.CartItemRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.UpdateCartItemRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ApiResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CartInfoResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.CartItemRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.UpdateCartItemRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.response.CartInfoResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

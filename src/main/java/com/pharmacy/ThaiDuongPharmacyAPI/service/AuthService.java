@@ -1,10 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.*;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.LoginResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.OtpResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.RegisterResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.TokenRefreshResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.auth.request.*;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.auth.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Account;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Otp;
@@ -55,7 +52,7 @@ public class AuthService {
                 refreshToken.getToken(),
                 "Bearer",
                 customer != null ? customer.getFullName() : null,
-                account.getRole().toString()
+                account.getRole()
         );
     }
 

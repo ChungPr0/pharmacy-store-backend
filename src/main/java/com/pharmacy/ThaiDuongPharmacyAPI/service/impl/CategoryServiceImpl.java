@@ -1,9 +1,9 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.CategoryRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryHierarchyResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryTreeResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.SubCategoryResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.request.CategoryRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryHierarchyResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.SubCategoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;

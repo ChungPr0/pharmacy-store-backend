@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.CheckoutRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.request.CheckoutRequestDTO;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

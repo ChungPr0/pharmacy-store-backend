@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.CheckoutRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.request.CheckoutRequestDTO;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.*;

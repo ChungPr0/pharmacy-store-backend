@@ -1,8 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.repository;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductListResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductSearchResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.RelatedProductResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductSearchResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.RelatedProductResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            "ORDER BY p.createdAt DESC")
     Page<Product> findValidLatestProducts(@Param("minExpiryDate") LocalDate minExpiryDate, Pageable pageable);
 
-    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductSearchResponse(" +
+    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductSearchResponse(" +
            "p.id, p.name, p.slug, p.imageUrl, p.price, p.isBestSeller, COALESCE(SUM(pb.stockQuantity), 0L)) " +
            "FROM Product p " +
            "LEFT JOIN p.batches pb " +
@@ -40,7 +40,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("keyword") String keyword,
             Pageable pageable);
 
-    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductSearchResponse(" +
+    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductSearchResponse(" +
            "p.id, p.name, p.slug, p.imageUrl, p.price, p.isBestSeller, COALESCE(SUM(pb.stockQuantity), 0L)) " +
            "FROM Product p " +
            "LEFT JOIN p.batches pb " +
@@ -71,7 +71,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT COALESCE(SUM(pb.stockQuantity), 0) FROM ProductBatch pb WHERE pb.product.id = :productId")
     Long getTotalStockQuantityByProductId(@Param("productId") Long productId);
 
-    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.response.RelatedProductResponse(" +
+    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.RelatedProductResponse(" +
            "p.id, p.name, p.slug, p.imageUrl, p.price, p.isBestSeller) " +
            "FROM Product p " +
            "WHERE p.category.id = :categoryId " +
@@ -88,7 +88,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findBySlug(String slug);
 
-    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductListResponse(" +
+    @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse(" +
            "p.id, p.name, p.slug, p.category.name, p.price, p.isActive, COALESCE(SUM(pb.stockQuantity), 0L)) " +
            "FROM Product p " +
            "LEFT JOIN p.batches pb " +

@@ -1,8 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.CartItemRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.UpdateCartItemRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CartInfoResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.CartItemRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.request.UpdateCartItemRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.cart.response.CartInfoResponse;
 
 public interface CartService {
     CartInfoResponse getCartInfo();

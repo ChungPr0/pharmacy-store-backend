@@ -1,9 +1,9 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.AdminProductRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductDetailResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductListResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.PagedResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductAttribute;

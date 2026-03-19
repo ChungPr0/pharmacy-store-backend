@@ -1,8 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ApiResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryHierarchyResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryTreeResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryHierarchyResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

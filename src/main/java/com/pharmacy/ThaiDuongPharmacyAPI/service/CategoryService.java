@@ -1,8 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.CategoryRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryHierarchyResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.CategoryTreeResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.request.CategoryRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryHierarchyResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
 
 import java.util.List;
 

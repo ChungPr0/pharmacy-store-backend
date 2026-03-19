@@ -1,11 +1,11 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.ProductSearchRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.PagedResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductCardResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductDetailResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ProductSearchResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.RelatedProductResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductCardResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductDetailResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductSearchResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.RelatedProductResponse;
 
 import java.util.List;
 

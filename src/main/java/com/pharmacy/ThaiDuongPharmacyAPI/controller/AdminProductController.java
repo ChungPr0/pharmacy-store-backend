@@ -1,10 +1,10 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.request.AdminProductRequestDTO;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductDetailResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.AdminProductListResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ApiResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.PagedResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequestDTO;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

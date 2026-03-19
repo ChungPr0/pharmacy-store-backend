@@ -1,6 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.exception;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.response.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
