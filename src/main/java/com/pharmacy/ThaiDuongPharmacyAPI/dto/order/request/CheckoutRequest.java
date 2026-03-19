@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CheckoutRequestDTO {
+public class CheckoutRequest {
 
     @NotBlank(message = "Địa chỉ giao hàng không được để trống")
     private String shippingAddressText;
