@@ -1,5 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.PageResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
@@ -34,25 +35,25 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<ProductCardResponse> getValidBestSellers(int limit) {
+    public PageResponse<ProductCardResponse> getValidBestSellers(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
         LocalDate minExpiryDate = getMinExpiryDate();
         Page<Product> productPage = productRepository.findValidBestSellers(minExpiryDate, pageable);
-        return mapToPagedResponse(productPage);
+        return mapToPageResponse(productPage);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<ProductCardResponse> getValidLatestProducts(int limit) {
+    public PageResponse<ProductCardResponse> getValidLatestProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
         LocalDate minExpiryDate = getMinExpiryDate();
         Page<Product> productPage = productRepository.findValidLatestProducts(minExpiryDate, pageable);
-        return mapToPagedResponse(productPage);
+        return mapToPageResponse(productPage);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<ProductSearchResponse> searchProducts(ProductSearchRequest request) {
+    public PageResponse<ProductSearchResponse> searchProducts(ProductSearchRequest request) {
         Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDir()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPageNo(), request.getPageSize(), sort);
 
@@ -77,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        return new PagedResponse<>(
+        return new PageResponse<>(
                 productPage.getContent(),
                 productPage.getNumber(),
                 productPage.getSize(),
@@ -159,12 +160,12 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
-    private PagedResponse<ProductCardResponse> mapToPagedResponse(Page<Product> productPage) {
+    private PageResponse<ProductCardResponse> mapToPageResponse(Page<Product> productPage) {
         List<ProductCardResponse> content = productPage.getContent().stream()
                 .map(this::mapToCardResponse)
                 .toList();
 
-        return new PagedResponse<>(
+        return new PageResponse<>(
                 content,
                 productPage.getNumber(),
                 productPage.getSize(),

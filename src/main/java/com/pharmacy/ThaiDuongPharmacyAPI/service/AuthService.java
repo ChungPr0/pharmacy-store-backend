@@ -6,19 +6,21 @@ import com.pharmacy.ThaiDuongPharmacyAPI.entity.Account;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Otp;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.RefreshToken;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.AccountRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CustomerRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.OtpRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.RefreshTokenRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -37,10 +39,10 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         Account account = accountRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new ApiException(401, "Số điện thoại hoặc mật khẩu không chính xác!"));
+                .orElseThrow(() -> new UnauthorizedException("Số điện thoại hoặc mật khẩu không chính xác!"));
 
         if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            throw new ApiException(401, "Số điện thoại hoặc mật khẩu không chính xác!");
+            throw new UnauthorizedException("Số điện thoại hoặc mật khẩu không chính xác!");
         }
 
         String accessToken = jwtUtils.generateToken(account.getPhone());
@@ -57,22 +59,22 @@ public class AuthService {
     }
 
     public void changePassword(ChangePasswordRequest request) {
-        String currentPhone = (String) org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal();
+        String currentPhone = (String) Objects.requireNonNull(SecurityContextHolder
+                .getContext().getAuthentication()).getPrincipal();
 
         Account account = accountRepository.findByPhone(currentPhone)
-                .orElseThrow(() -> new ApiException(404, "Không tìm thấy tài khoản!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản!"));
 
         if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
-            throw new ApiException(400, "Mật khẩu hiện tại không chính xác!");
+            throw new BadRequestException("Mật khẩu hiện tại không chính xác!");
         }
 
         if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
-            throw new ApiException(400, "Mật khẩu mới không được trùng với mật khẩu hiện tại!");
+            throw new BadRequestException("Mật khẩu mới không được trùng với mật khẩu hiện tại!");
         }
 
         if (account.getPreviousPassword() != null && passwordEncoder.matches(request.getNewPassword(), account.getPreviousPassword())) {
-            throw new ApiException(400, "Mật khẩu mới đã từng được sử dụng trước đây, vui lòng chọn mật khẩu khác!");
+            throw new BadRequestException("Mật khẩu mới đã từng được sử dụng trước đây, vui lòng chọn mật khẩu khác!");
         }
 
         account.setPreviousPassword(account.getPassword());
@@ -84,7 +86,7 @@ public class AuthService {
 
     public OtpResponse forgotPasswordRequestOtp(ForgotPasswordRequest request) {
         if (!accountRepository.existsByPhone(request.getPhone())) {
-            throw new ApiException(404, "Số điện thoại này chưa được đăng ký!");
+            throw new ResourceNotFoundException("Số điện thoại này chưa được đăng ký!");
         }
         
         sendOtp(request.getPhone(), "FORGOT PASSWORD");
@@ -93,23 +95,23 @@ public class AuthService {
 
     public void forgotPasswordVerifyOtp(ForgotPasswordVerifyOtpRequest request) {
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
-                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
+                .orElseThrow(() -> new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!"));
 
         if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
+            throw new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!");
         }
     }
 
     public void forgotPasswordReset(ForgotPasswordResetRequest request) {
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
-                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
+                .orElseThrow(() -> new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!"));
 
         if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
+            throw new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!");
         }
 
         Account account = accountRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new ApiException(404, "Tài khoản không tồn tại!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tài khoản không tồn tại!"));
 
         account.setPreviousPassword(account.getPassword());
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -123,7 +125,7 @@ public class AuthService {
 
     public OtpResponse requestOtp(RegisterRequest request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
-            throw new ApiException(400, "Số điện thoại này đã được đăng ký!");
+            throw new BadRequestException("Số điện thoại này đã được đăng ký!");
         }
 
         sendOtp(request.getPhone(), "REGISTER");
@@ -132,14 +134,14 @@ public class AuthService {
 
     public RegisterResponse verifyOtpAndRegister(RegisterVerifyOtpRequest request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
-            throw new ApiException(400, "Số điện thoại này đã được đăng ký!");
+            throw new BadRequestException("Số điện thoại này đã được đăng ký!");
         }
 
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
-                .orElseThrow(() -> new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!"));
+                .orElseThrow(() -> new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!"));
 
         if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ApiException(400, "Mã OTP không chính xác hoặc đã hết hạn!");
+            throw new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!");
         }
 
         validOtp.setIsUsed(true);
@@ -195,11 +197,11 @@ public class AuthService {
         String requestRefreshToken = request.getRefreshToken();
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(requestRefreshToken)
-                .orElseThrow(() -> new ApiException(403, "Refresh Token không tồn tại!"));
+                .orElseThrow(() -> new ForbiddenException("Refresh Token không tồn tại!"));
 
         if (refreshToken.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(refreshToken);
-            throw new ApiException(403, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+            throw new ForbiddenException("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
         }
 
         Account account = refreshToken.getAccount();

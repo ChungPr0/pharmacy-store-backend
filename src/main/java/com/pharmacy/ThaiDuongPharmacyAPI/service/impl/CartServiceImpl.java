@@ -8,7 +8,8 @@ import com.pharmacy.ThaiDuongPharmacyAPI.entity.Cart;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.CartItem;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CartItemRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CartRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.ProductRepository;
@@ -93,10 +94,10 @@ public class CartServiceImpl implements CartService {
                 });
 
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ApiException(404, "Sản phẩm không tồn tại!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm không tồn tại!"));
 
         if (product.getIsActive() == null || !product.getIsActive()) {
-            throw new ApiException(400, "Sản phẩm đã ngừng kinh doanh!");
+            throw new BadRequestException("Sản phẩm đã ngừng kinh doanh!");
         }
 
         Optional<CartItem> existingItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
@@ -119,10 +120,10 @@ public class CartServiceImpl implements CartService {
     public void updateCartItemQuantity(UpdateCartItemRequest request) {
         Long customerId = authUtils.getCurrentCustomerId();
         Cart cart = cartRepository.findByCustomerId(customerId)
-                .orElseThrow(() -> new ApiException(404, "Giỏ hàng trống!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Giỏ hàng trống!"));
 
         CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), request.getProductId())
-                .orElseThrow(() -> new ApiException(404, "Sản phẩm không có trong giỏ hàng!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm không có trong giỏ hàng!"));
 
         if (request.getQuantity() <= 0) {
             cartItemRepository.delete(cartItem);
@@ -137,10 +138,10 @@ public class CartServiceImpl implements CartService {
     public void removeProductFromCart(Long productId) {
         Long customerId = authUtils.getCurrentCustomerId();
         Cart cart = cartRepository.findByCustomerId(customerId)
-                .orElseThrow(() -> new ApiException(404, "Giỏ hàng trống!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Giỏ hàng trống!"));
 
         CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
-                .orElseThrow(() -> new ApiException(404, "Sản phẩm không có trong giỏ hàng!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm không có trong giỏ hàng!"));
 
         cartItemRepository.delete(cartItem);
     }

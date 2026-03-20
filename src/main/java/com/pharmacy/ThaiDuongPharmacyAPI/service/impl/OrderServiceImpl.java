@@ -8,10 +8,7 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderAdminResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderHistoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.*;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ForbiddenException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.OrderService;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.AuthUtils;
@@ -45,12 +42,12 @@ public class OrderServiceImpl implements OrderService {
         List<CartItem> cartItems = cartItemRepository.findAllById(request.getCartItemIds());
 
         if (cartItems.isEmpty() || cartItems.size() != request.getCartItemIds().size()) {
-            throw new ApiException(400, "Một hoặc nhiều sản phẩm trong giỏ hàng không hợp lệ.");
+            throw new BadRequestException("Một hoặc nhiều sản phẩm trong giỏ hàng không hợp lệ.");
         }
 
         for (CartItem item : cartItems) {
             if (!item.getCart().getCustomer().getId().equals(currentCustomer.getId())) {
-                throw new ApiException(403, "Bạn không có quyền thanh toán sản phẩm này.");
+                throw new ForbiddenException("Bạn không có quyền thanh toán sản phẩm này.");
             }
         }
 
@@ -69,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
             Product product = cartItem.getProduct();
 
             if (product.getIsActive() == null || !product.getIsActive()) {
-                throw new ApiException(400, "Sản phẩm " + product.getName() + " đã ngừng kinh doanh.");
+                throw new BadRequestException("Sản phẩm " + product.getName() + " đã ngừng kinh doanh.");
             }
 
             int requiredQuantity = cartItem.getQuantity();
@@ -79,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
             int availableStock = batches.stream().mapToInt(ProductBatch::getStockQuantity).sum();
 
             if (availableStock < requiredQuantity) {
-                throw new ApiException(400, "Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
+                throw new BadRequestException("Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
             }
 
             int remainingToDeduct = requiredQuantity;
@@ -112,8 +109,6 @@ public class OrderServiceImpl implements OrderService {
         cartItemRepository.deleteAllByIdInBatch(request.getCartItemIds());
     }
 
-    // --- Customer APIs ---
-
     @Override
     @Transactional(readOnly = true)
     public List<OrderHistoryResponse> getMyOrders() {
@@ -138,8 +133,6 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderDetailResponse.fromEntity(order);
     }
-
-    // --- Admin APIs ---
 
     @Override
     @Transactional(readOnly = true)

@@ -1,10 +1,10 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.PageResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,7 +30,7 @@ public class AdminProductController {
     @Operation(summary = "Lấy danh sách sản phẩm", description = "Lấy danh sách sản phẩm có phân trang, có thể lọc theo keyword và categorySlug. Bao gồm tổng số lượng tồn kho.")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<ApiResponse<PagedResponse<AdminProductListResponse>>> getProducts(
+    public ResponseEntity<ApiResponse<PageResponse<AdminProductListResponse>>> getProducts(
             @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
             @RequestParam(value = "keyword", required = false) String keyword,

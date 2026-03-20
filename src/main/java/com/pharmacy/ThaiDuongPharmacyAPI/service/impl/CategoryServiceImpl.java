@@ -5,7 +5,6 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryHierarchy
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.SubCategoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;
 import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CategoryRepository;
@@ -98,7 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (request.getParentId() != null) {
             if (category.getId().equals(request.getParentId())) {
-                throw new ApiException(400, "Danh mục không thể tự làm cha của chính nó");
+                throw new BadRequestException("Danh mục không thể tự làm cha của chính nó");
             }
             Category parent = categoryRepository.findById(request.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục cha"));
@@ -122,11 +121,11 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
 
         if (category.getChildren() != null && !category.getChildren().isEmpty()) {
-            throw new ApiException(400, "Không thể xóa: Vui lòng xóa các danh mục con trước");
+            throw new BadRequestException("Vui lòng xóa các danh mục con trước");
         }
 
         if (productRepository.existsByCategoryId(category.getId())) {
-            throw new ApiException(400, "Không thể xóa: Danh mục đang chứa sản phẩm");
+            throw new BadRequestException("Danh mục đang chứa sản phẩm");
         }
 
         categoryRepository.delete(category);

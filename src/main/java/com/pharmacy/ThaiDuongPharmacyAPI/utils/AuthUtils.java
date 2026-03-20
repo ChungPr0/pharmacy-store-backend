@@ -2,7 +2,8 @@ package com.pharmacy.ThaiDuongPharmacyAPI.utils;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Account;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.UnauthorizedException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.AccountRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,15 @@ public class AuthUtils {
     public Long getCurrentCustomerId() {
         String phone = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (phone == null) {
-            throw new ApiException(401, "Không tìm thấy thông tin đăng nhập");
+            throw new UnauthorizedException("Không tìm thấy thông tin đăng nhập");
         }
 
         Account account = accountRepository.findByPhone(phone)
-                .orElseThrow(() -> new ApiException(404, "Tài khoản không tồn tại"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tài khoản không tồn tại"));
 
         Customer customer = customerRepository.findByAccount(account);
         if (customer == null) {
-            throw new ApiException(404, "Thông tin khách hàng không tồn tại");
+            throw new ResourceNotFoundException("Thông tin khách hàng không tồn tại");
         }
 
         return customer.getId();
@@ -36,15 +37,15 @@ public class AuthUtils {
     public Customer getCurrentCustomer() {
         String phone = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (phone == null) {
-            throw new ApiException(401, "Không tìm thấy thông tin đăng nhập");
+            throw new UnauthorizedException("Không tìm thấy thông tin đăng nhập");
         }
 
         Account account = accountRepository.findByPhone(phone)
-                .orElseThrow(() -> new ApiException(404, "Tài khoản không tồn tại"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tài khoản không tồn tại"));
 
         Customer customer = customerRepository.findByAccount(account);
         if (customer == null) {
-            throw new ApiException(404, "Thông tin khách hàng không tồn tại");
+            throw new ResourceNotFoundException("Thông tin khách hàng không tồn tại");
         }
 
         return customer;

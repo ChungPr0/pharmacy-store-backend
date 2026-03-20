@@ -1,6 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.PageResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductSearchRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.ProductService;
@@ -24,21 +25,21 @@ public class ProductController {
 
     @Operation(summary = "Lấy danh sách Sản phẩm Bán chạy", description = "Trả về danh sách các sản phẩm đang được đánh dấu là bán chạy, có tồn kho và hạn sử dụng an toàn.")
     @GetMapping("/best-sellers")
-    public ResponseEntity<ApiResponse<PagedResponse<ProductCardResponse>>> getBestSellers(
+    public ResponseEntity<ApiResponse<PageResponse<ProductCardResponse>>> getBestSellers(
             @RequestParam(defaultValue = "10") int limit) {
         return ApiResponse.success("Lấy danh sách sản phẩm thành công", productService.getValidBestSellers(limit));
     }
 
     @Operation(summary = "Lấy danh sách Sản phẩm Mới nhất", description = "Trả về danh sách các sản phẩm mới thêm vào hệ thống gần đây nhất.")
     @GetMapping("/latest")
-    public ResponseEntity<ApiResponse<PagedResponse<ProductCardResponse>>> getLatestProducts(
+    public ResponseEntity<ApiResponse<PageResponse<ProductCardResponse>>> getLatestProducts(
             @RequestParam(defaultValue = "10") int limit) {
         return ApiResponse.success("Lấy danh sách sản phẩm thành công", productService.getValidLatestProducts(limit));
     }
 
     @Operation(summary = "Tìm kiếm & Lọc Sản phẩm", description = "API đa năng để lọc theo danh mục, tìm kiếm theo từ khoá, phân trang và sắp xếp.")
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PagedResponse<ProductSearchResponse>>> searchProducts(
+    public ResponseEntity<ApiResponse<PageResponse<ProductSearchResponse>>> searchProducts(
             @Valid @RequestBody ProductSearchRequest request) {
         return ApiResponse.success("Tìm kiếm sản phẩm thành công", productService.searchProducts(request));
     }

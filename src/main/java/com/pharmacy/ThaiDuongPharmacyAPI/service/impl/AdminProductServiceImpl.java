@@ -1,9 +1,9 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.PageResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.PagedResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductAttribute;
@@ -37,10 +37,10 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<AdminProductListResponse> getProductList(int pageNo, int pageSize, String keyword, String categorySlug) {
+    public PageResponse<AdminProductListResponse> getProductList(int pageNo, int pageSize, String keyword, String categorySlug) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<AdminProductListResponse> page = productRepository.getAdminProductList(keyword, categorySlug, pageable);
-        return new PagedResponse<>(
+        return new PageResponse<>(
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),

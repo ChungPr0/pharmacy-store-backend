@@ -35,4 +35,7 @@ public class ProductBatch {
 
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity = 0;
+
+    @Column(name = "import_note", columnDefinition = "TEXT")
+    private String importNote;
 }

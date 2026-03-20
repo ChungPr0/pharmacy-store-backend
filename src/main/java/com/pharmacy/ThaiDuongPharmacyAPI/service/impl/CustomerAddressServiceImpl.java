@@ -42,9 +42,9 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         boolean isDefault = requestDTO.getIsDefault() != null && requestDTO.getIsDefault();
 
         if (!hasExistingAddresses) {
-            isDefault = true; // Rule 1
+            isDefault = true;
         } else if (isDefault) {
-            addressRepository.resetDefaultAddressForCustomer(customerId); // Rule 2
+            addressRepository.resetDefaultAddressForCustomer(customerId);
         }
 
         CustomerAddress address = new CustomerAddress();
@@ -69,7 +69,6 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
         boolean isDefaultRequest = requestDTO.getIsDefault() != null && requestDTO.getIsDefault();
 
-        // If trying to set as default, reset others first
         if (isDefaultRequest && !address.getIsDefault()) {
             addressRepository.resetDefaultAddressForCustomer(customerId);
         }
@@ -80,10 +79,8 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         if (!isDefaultRequest) {
              List<CustomerAddress> existingAddresses = addressRepository.findByCustomerIdOrderByIsDefaultDescIdDesc(customerId);
              if (existingAddresses.size() == 1) {
-                  // If it's the only one, it must be default
                   isDefault = true;
              } else if (address.getIsDefault()) {
-                  // Cannot disable default without setting another one default
                   isDefault = true; 
              }
         }
@@ -108,9 +105,8 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         boolean wasDefault = address.getIsDefault();
         addressRepository.delete(address);
         
-        addressRepository.flush(); // Flush to make sure it's gone from DB before checking the next one
+        addressRepository.flush();
 
-        // If it was default, set another to default
         if (wasDefault) {
             addressRepository.findFirstByCustomerIdOrderByIdDesc(customerId).ifPresent(newDefault -> {
                 newDefault.setIsDefault(true);
@@ -131,7 +127,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         }
 
         if (address.getIsDefault()) {
-            return; // Already default
+            return;
         }
 
         addressRepository.resetDefaultAddressForCustomer(customerId);
