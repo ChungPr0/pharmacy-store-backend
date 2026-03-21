@@ -8,13 +8,13 @@ import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductAttribute;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductImage;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CategoryRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.ProductRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AdminProductService;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.SlugUtils;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,11 +55,11 @@ public class AdminProductServiceImpl implements AdminProductService {
     public Map<String, Object> createProduct(AdminProductRequest request) {
         String slug = SlugUtils.toSlug(request.getName());
         if (productRepository.existsBySlug(slug)) {
-            throw new BadRequestException("Tên sản phẩm đã tồn tại!");
+            throw ApiException.badRequest("Tên sản phẩm đã tồn tại!");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục"));
 
         Product product = new Product();
         product.setName(request.getName());
@@ -70,7 +70,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         product.setCategory(category);
 
         if (request.getImages() != null && !request.getImages().isEmpty()) {
-            product.setImageUrl(request.getImages().get(0)); // First image is thumbnail
+            product.setImageUrl(request.getImages().get(0));
             for (String url : request.getImages()) {
                 ProductImage image = new ProductImage();
                 image.setImageUrl(url);
@@ -96,7 +96,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             response.put("slug", savedProduct.getSlug());
             return response;
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("Tên sản phẩm đã tồn tại!");
+            throw ApiException.badRequest("Tên sản phẩm đã tồn tại!");
         }
     }
 
@@ -104,9 +104,9 @@ public class AdminProductServiceImpl implements AdminProductService {
     @Transactional(readOnly = true)
     public AdminProductDetailResponse getProductDetail(String slug) {
         Product product = productRepository.findAdminBySlugWithDetails(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm"));
 
-        product.getAttributes().size(); 
+        Hibernate.initialize(product.getAttributes());
         
         return mapToDetailResponse(product);
     }
@@ -115,17 +115,17 @@ public class AdminProductServiceImpl implements AdminProductService {
     @Transactional
     public Map<String, String> updateProduct(String slug, AdminProductRequest request) {
         Product product = productRepository.findAdminBySlugWithDetails(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm"));
 
-        product.getAttributes().size();
+        Hibernate.initialize(product.getAttributes());
 
         String newSlug = SlugUtils.toSlug(request.getName());
         if (!newSlug.equals(product.getSlug()) && productRepository.existsBySlug(newSlug)) {
-            throw new BadRequestException("Tên sản phẩm đã tồn tại!");
+            throw ApiException.badRequest("Tên sản phẩm đã tồn tại!");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục"));
 
         product.setName(request.getName());
         product.setSlug(newSlug);
@@ -164,7 +164,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             response.put("slug", newSlug);
             return response;
         } catch (DataIntegrityViolationException e) {
-             throw new BadRequestException("Tên sản phẩm đã tồn tại!");
+             throw ApiException.badRequest("Tên sản phẩm đã tồn tại!");
         }
     }
 
@@ -172,7 +172,7 @@ public class AdminProductServiceImpl implements AdminProductService {
     @Transactional
     public void toggleProductStatus(String slug) {
         Product product = productRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm"));
         product.setIsActive(!product.getIsActive());
         productRepository.save(product);
     }

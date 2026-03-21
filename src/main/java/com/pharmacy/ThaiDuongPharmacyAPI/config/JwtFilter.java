@@ -1,17 +1,16 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.config;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Account;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.UnauthorizedException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.AccountRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -57,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             phone = jwtUtils.extractPhone(token);
         } catch (Exception e) {
-            exceptionResolver.resolveException(request, response, null, new UnauthorizedException("Mã xác thực không hợp lệ hoặc đã hết hạn, vui lòng đăng nhập lại!"));
+            exceptionResolver.resolveException(request, response, null, ApiException.unauthorized("Mã xác thực không hợp lệ hoặc đã hết hạn, vui lòng đăng nhập lại!"));
             return;
         }
 
@@ -78,11 +77,11 @@ public class JwtFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
-                    exceptionResolver.resolveException(request, response, null, new UnauthorizedException("Tài khoản không tồn tại!"));
+                    exceptionResolver.resolveException(request, response, null, ApiException.unauthorized("Tài khoản không tồn tại!"));
                     return;
                 }
             } else {
-                exceptionResolver.resolveException(request, response, null, new UnauthorizedException("Từ chối truy cập!"));
+                exceptionResolver.resolveException(request, response, null, ApiException.unauthorized("Từ chối truy cập!"));
                 return;
             }
         }

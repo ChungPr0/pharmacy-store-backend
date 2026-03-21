@@ -4,8 +4,7 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.request.AddressRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.address.response.AddressResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.CustomerAddress;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ForbiddenException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CustomerAddressRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CustomerAddressService;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.AuthUtils;
@@ -61,10 +60,10 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
     public AddressResponse updateAddress(Long id, AddressRequest requestDTO) {
         Long customerId = authUtils.getCurrentCustomerId();
         CustomerAddress address = addressRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy địa chỉ"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy địa chỉ"));
 
         if (!address.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("Bạn không có quyền chỉnh sửa địa chỉ này");
+            throw ApiException.forbidden("Bạn không có quyền chỉnh sửa địa chỉ này");
         }
 
         boolean isDefaultRequest = requestDTO.getIsDefault() != null && requestDTO.getIsDefault();
@@ -96,10 +95,10 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
     public void deleteAddress(Long id) {
         Long customerId = authUtils.getCurrentCustomerId();
         CustomerAddress address = addressRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy địa chỉ"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy địa chỉ"));
 
         if (!address.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("Bạn không có quyền xóa địa chỉ này");
+            throw ApiException.forbidden("Bạn không có quyền xóa địa chỉ này");
         }
 
         boolean wasDefault = address.getIsDefault();
@@ -120,10 +119,10 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
     public void setDefaultAddress(Long id) {
         Long customerId = authUtils.getCurrentCustomerId();
         CustomerAddress address = addressRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy địa chỉ"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy địa chỉ"));
 
         if (!address.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("Bạn không có quyền thay đổi địa chỉ này");
+            throw ApiException.forbidden("Bạn không có quyền thay đổi địa chỉ này");
         }
 
         if (address.getIsDefault()) {

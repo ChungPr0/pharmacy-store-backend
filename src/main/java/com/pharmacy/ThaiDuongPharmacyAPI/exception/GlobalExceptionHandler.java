@@ -1,6 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.exception;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,8 +15,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ApiResponse<Void>> handleApiException(ApiException ex) {
-        return ApiResponse.error(ex.getStatus(), ex.getMessage());
+    public ResponseEntity<ApiResponse<Object>> handleApiException(ApiException ex) {
+        return ApiResponse.error(ex.getStatus(), ex.getMessage(), ex.getData());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -26,11 +27,11 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ApiResponse.error(400, "Dữ liệu không hợp lệ", errors);
+        return ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Dữ liệu không hợp lệ", errors);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
-        return ApiResponse.error(500, "Đã xảy ra lỗi hệ thống: " + ex.getMessage());
+        return ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Đã xảy ra lỗi hệ thống: " + ex.getMessage());
     }
 }

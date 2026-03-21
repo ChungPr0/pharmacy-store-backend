@@ -6,8 +6,7 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductBatchItemReq
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductBatchHistoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductBatch;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.ProductBatchRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.ProductRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AdminProductBatchService;
@@ -37,11 +36,11 @@ public class AdminProductBatchServiceImpl implements AdminProductBatchService {
 
         for (ProductBatchItemRequest item : request.getItems()) {
             if (item.getManufactureDate().isAfter(item.getExpiryDate()) || item.getManufactureDate().isEqual(item.getExpiryDate())) {
-                throw new BadRequestException("Ngày sản xuất phải trước ngày hết hạn");
+                throw ApiException.badRequest("Ngày sản xuất phải trước ngày hết hạn");
             }
 
             Product product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm có id " + item.getProductId()));
+                    .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm có id " + item.getProductId()));
 
             ProductBatch batch = new ProductBatch();
             batch.setProduct(product);

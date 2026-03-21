@@ -39,10 +39,10 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         Account account = accountRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new UnauthorizedException("Số điện thoại hoặc mật khẩu không chính xác!"));
+                .orElseThrow(() -> ApiException.unauthorized("Số điện thoại hoặc mật khẩu không chính xác!"));
 
         if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            throw new UnauthorizedException("Số điện thoại hoặc mật khẩu không chính xác!");
+            throw ApiException.unauthorized("Số điện thoại hoặc mật khẩu không chính xác!");
         }
 
         String accessToken = jwtUtils.generateToken(account.getPhone());
@@ -63,18 +63,18 @@ public class AuthService {
                 .getContext().getAuthentication()).getPrincipal();
 
         Account account = accountRepository.findByPhone(currentPhone)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản!"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy tài khoản!"));
 
         if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
-            throw new BadRequestException("Mật khẩu hiện tại không chính xác!");
+            throw ApiException.badRequest("Mật khẩu hiện tại không chính xác!");
         }
 
         if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
-            throw new BadRequestException("Mật khẩu mới không được trùng với mật khẩu hiện tại!");
+            throw ApiException.badRequest("Mật khẩu mới không được trùng với mật khẩu hiện tại!");
         }
 
         if (account.getPreviousPassword() != null && passwordEncoder.matches(request.getNewPassword(), account.getPreviousPassword())) {
-            throw new BadRequestException("Mật khẩu mới đã từng được sử dụng trước đây, vui lòng chọn mật khẩu khác!");
+            throw ApiException.badRequest("Mật khẩu mới đã từng được sử dụng trước đây, vui lòng chọn mật khẩu khác!");
         }
 
         account.setPreviousPassword(account.getPassword());
@@ -86,7 +86,7 @@ public class AuthService {
 
     public OtpResponse forgotPasswordRequestOtp(ForgotPasswordRequest request) {
         if (!accountRepository.existsByPhone(request.getPhone())) {
-            throw new ResourceNotFoundException("Số điện thoại này chưa được đăng ký!");
+            throw ApiException.notFound("Số điện thoại này chưa được đăng ký!");
         }
         
         sendOtp(request.getPhone(), "FORGOT PASSWORD");
@@ -95,23 +95,23 @@ public class AuthService {
 
     public void forgotPasswordVerifyOtp(ForgotPasswordVerifyOtpRequest request) {
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
-                .orElseThrow(() -> new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!"));
+                .orElseThrow(() -> ApiException.badRequest("Mã OTP không chính xác hoặc đã hết hạn!"));
 
         if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!");
+            throw ApiException.badRequest("Mã OTP không chính xác hoặc đã hết hạn!");
         }
     }
 
     public void forgotPasswordReset(ForgotPasswordResetRequest request) {
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
-                .orElseThrow(() -> new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!"));
+                .orElseThrow(() -> ApiException.badRequest("Mã OTP không chính xác hoặc đã hết hạn!"));
 
         if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!");
+            throw ApiException.badRequest("Mã OTP không chính xác hoặc đã hết hạn!");
         }
 
         Account account = accountRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new ResourceNotFoundException("Tài khoản không tồn tại!"));
+                .orElseThrow(() -> ApiException.notFound("Tài khoản không tồn tại!"));
 
         account.setPreviousPassword(account.getPassword());
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -125,7 +125,7 @@ public class AuthService {
 
     public OtpResponse requestOtp(RegisterRequest request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
-            throw new BadRequestException("Số điện thoại này đã được đăng ký!");
+            throw ApiException.badRequest("Số điện thoại này đã được đăng ký!");
         }
 
         sendOtp(request.getPhone(), "REGISTER");
@@ -134,14 +134,14 @@ public class AuthService {
 
     public RegisterResponse verifyOtpAndRegister(RegisterVerifyOtpRequest request) {
         if (accountRepository.existsByPhone(request.getPhone())) {
-            throw new BadRequestException("Số điện thoại này đã được đăng ký!");
+            throw ApiException.badRequest("Số điện thoại này đã được đăng ký!");
         }
 
         Otp validOtp = otpRepository.findByPhoneAndOtpCodeAndIsUsedFalse(request.getPhone(), request.getOtpCode())
-                .orElseThrow(() -> new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!"));
+                .orElseThrow(() -> ApiException.badRequest("Mã OTP không chính xác hoặc đã hết hạn!"));
 
         if (validOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Mã OTP không chính xác hoặc đã hết hạn!");
+            throw ApiException.badRequest("Mã OTP không chính xác hoặc đã hết hạn!");
         }
 
         validOtp.setIsUsed(true);
@@ -197,11 +197,11 @@ public class AuthService {
         String requestRefreshToken = request.getRefreshToken();
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(requestRefreshToken)
-                .orElseThrow(() -> new ForbiddenException("Refresh Token không tồn tại!"));
+                .orElseThrow(() -> ApiException.forbidden("Refresh Token không tồn tại!"));
 
         if (refreshToken.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(refreshToken);
-            throw new ForbiddenException("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+            throw ApiException.forbidden("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
         }
 
         Account account = refreshToken.getAccount();

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class SlugUtils {
 
     private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s");
 
     public static String toSlug(String input) {
         if (input == null) return "";

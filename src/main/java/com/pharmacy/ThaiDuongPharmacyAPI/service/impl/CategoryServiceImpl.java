@@ -5,8 +5,7 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryHierarchy
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.CategoryTreeResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.category.response.SubCategoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.BadRequestException;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CategoryRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.ProductRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CategoryService;
@@ -38,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryHierarchyResponse getCategoryHierarchy(String slug) {
         Category category = categoryRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với slug: " + slug));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục với slug: " + slug));
 
         List<SubCategoryResponse> children = (category.getChildren() == null || category.getChildren().isEmpty())
                 ? Collections.emptyList()
@@ -59,7 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryTreeResponse createCategory(CategoryRequest request) {
         String slug = SlugUtils.toSlug(request.getName());
         if (categoryRepository.existsBySlug(slug)) {
-            throw new BadRequestException("Tên danh mục đã tồn tại!");
+            throw ApiException.badRequest("Tên danh mục đã tồn tại!");
         }
 
         Category category = new Category();
@@ -68,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (request.getParentId() != null) {
             Category parent = categoryRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục cha"));
+                    .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục cha"));
             category.setParent(parent);
         }
 
@@ -76,7 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
             Category savedCategory = categoryRepository.save(category);
             return mapToTreeResponse(savedCategory);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("Tên danh mục đã tồn tại!");
+            throw ApiException.badRequest("Tên danh mục đã tồn tại!");
         }
     }
 
@@ -84,12 +83,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryTreeResponse updateCategory(String slug, CategoryRequest request) {
         Category category = categoryRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục"));
 
         String newSlug = SlugUtils.toSlug(request.getName());
 
         if (!newSlug.equals(category.getSlug()) && categoryRepository.existsBySlug(newSlug)) {
-            throw new BadRequestException("Tên danh mục đã tồn tại!");
+            throw ApiException.badRequest("Tên danh mục đã tồn tại!");
         }
 
         category.setName(request.getName());
@@ -97,10 +96,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (request.getParentId() != null) {
             if (category.getId().equals(request.getParentId())) {
-                throw new BadRequestException("Danh mục không thể tự làm cha của chính nó");
+                throw ApiException.badRequest("Danh mục không thể tự làm cha của chính nó");
             }
             Category parent = categoryRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục cha"));
+                    .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục cha"));
             category.setParent(parent);
         } else {
             category.setParent(null);
@@ -110,7 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
             Category updatedCategory = categoryRepository.save(category);
             return mapToTreeResponse(updatedCategory);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("Tên danh mục đã tồn tại!");
+            throw ApiException.badRequest("Tên danh mục đã tồn tại!");
         }
     }
 
@@ -118,14 +117,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(String slug) {
         Category category = categoryRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục"));
 
         if (category.getChildren() != null && !category.getChildren().isEmpty()) {
-            throw new BadRequestException("Vui lòng xóa các danh mục con trước");
+            throw ApiException.badRequest("Vui lòng xóa các danh mục con trước");
         }
 
         if (productRepository.existsByCategoryId(category.getId())) {
-            throw new BadRequestException("Danh mục đang chứa sản phẩm");
+            throw ApiException.badRequest("Danh mục đang chứa sản phẩm");
         }
 
         categoryRepository.delete(category);

@@ -1,10 +1,10 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.config;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ForbiddenException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -21,6 +21,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AccessDeniedException accessDeniedException) {
-        resolver.resolveException(request, response, null, new ForbiddenException("Bạn không có quyền truy cập vào tài nguyên này!"));
+        resolver.resolveException(request, response, null, ApiException.forbidden("Bạn không có quyền truy cập vào tài nguyên này!"));
     }
 }

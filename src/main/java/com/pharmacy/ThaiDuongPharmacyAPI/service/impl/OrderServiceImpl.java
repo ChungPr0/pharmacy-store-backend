@@ -8,7 +8,7 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderAdminResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderHistoryResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.*;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.*;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.OrderService;
 import com.pharmacy.ThaiDuongPharmacyAPI.utils.AuthUtils;
@@ -42,12 +42,12 @@ public class OrderServiceImpl implements OrderService {
         List<CartItem> cartItems = cartItemRepository.findAllById(request.getCartItemIds());
 
         if (cartItems.isEmpty() || cartItems.size() != request.getCartItemIds().size()) {
-            throw new BadRequestException("Một hoặc nhiều sản phẩm trong giỏ hàng không hợp lệ.");
+            throw ApiException.badRequest("Một hoặc nhiều sản phẩm trong giỏ hàng không hợp lệ.");
         }
 
         for (CartItem item : cartItems) {
             if (!item.getCart().getCustomer().getId().equals(currentCustomer.getId())) {
-                throw new ForbiddenException("Bạn không có quyền thanh toán sản phẩm này.");
+                throw ApiException.forbidden("Bạn không có quyền thanh toán sản phẩm này.");
             }
         }
 
@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
             Product product = cartItem.getProduct();
 
             if (product.getIsActive() == null || !product.getIsActive()) {
-                throw new BadRequestException("Sản phẩm " + product.getName() + " đã ngừng kinh doanh.");
+                throw ApiException.badRequest("Sản phẩm " + product.getName() + " đã ngừng kinh doanh.");
             }
 
             int requiredQuantity = cartItem.getQuantity();
@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
             int availableStock = batches.stream().mapToInt(ProductBatch::getStockQuantity).sum();
 
             if (availableStock < requiredQuantity) {
-                throw new BadRequestException("Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
+                throw ApiException.badRequest("Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
             }
 
             int remainingToDeduct = requiredQuantity;
@@ -125,10 +125,10 @@ public class OrderServiceImpl implements OrderService {
     public OrderDetailResponse getMyOrderDetail(String orderCode) {
         Long customerId = authUtils.getCurrentCustomerId();
         Order order = orderRepository.findByOrderCode(orderCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với mã: " + orderCode));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy đơn hàng với mã: " + orderCode));
 
         if (!order.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("Bạn không có quyền xem thông tin đơn hàng này");
+            throw ApiException.forbidden("Bạn không có quyền xem thông tin đơn hàng này");
         }
 
         return OrderDetailResponse.fromEntity(order);
@@ -151,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderDetailResponse getAdminOrderDetail(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với ID: " + id));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy đơn hàng với ID: " + id));
 
         return OrderDetailResponse.fromEntity(order);
     }
@@ -160,14 +160,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateOrderStatus(Long id, OrderStatusUpdateRequest request) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với ID: " + id));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy đơn hàng với ID: " + id));
 
         if (order.getStatus() == Order.OrderStatus.CANCELLED && request.getStatus() != Order.OrderStatus.CANCELLED) {
-            throw new BadRequestException("Không thể thay đổi trạng thái của đơn hàng đã hủy");
+            throw ApiException.badRequest("Không thể thay đổi trạng thái của đơn hàng đã hủy");
         }
         
         if (order.getStatus() == Order.OrderStatus.DELIVERED && request.getStatus() == Order.OrderStatus.CANCELLED) {
-            throw new BadRequestException("Không thể hủy đơn hàng đã giao thành công");
+            throw ApiException.badRequest("Không thể hủy đơn hàng đã giao thành công");
         }
 
         order.setStatus(request.getStatus());

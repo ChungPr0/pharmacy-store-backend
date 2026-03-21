@@ -6,7 +6,7 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.*;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Category;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Product;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.ProductImage;
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ResourceNotFoundException;
+import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CategoryRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.ProductRepository;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.ProductService;
@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
             );
         } else {
             Category category = categoryRepository.findBySlug(request.getCategorySlug())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục với slug: " + request.getCategorySlug()));
+                    .orElseThrow(() -> ApiException.notFound("Không tìm thấy danh mục với slug: " + request.getCategorySlug()));
 
             List<Long> categoryIds = new ArrayList<>();
             collectCategoryIds(category, categoryIds);
@@ -92,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductDetailResponse getProductDetail(String slug) {
         Product product = productRepository.findBySlugWithDetails(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm"));
 
         Product productWithAttributes = productRepository.findProductAttributesById(product.getId())
                 .orElse(product);
@@ -130,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public List<RelatedProductResponse> getRelatedProducts(String slug, int limit) {
         Product product = productRepository.findBySlugWithDetails(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm"));
 
         int safeLimit = Math.min(limit, 10);
         Pageable pageable = PageRequest.of(0, safeLimit);
