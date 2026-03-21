@@ -18,8 +18,11 @@ Backend RESTful API cho hệ thống Nhà thuốc Thái Dương. Hệ thống đ
 ## 🗄️ Database Schema (Current)
 
 Hệ thống cơ sở dữ liệu hiện tại bao gồm các module chính:
-* **Auth & User:** `accounts`, `customers`, `otps`, `refresh_tokens`.
+* **Auth & User:** `accounts`, `customers`, `otps`, `refresh_tokens`, `customer_addresses`.
 * **Product Catalog:** `categories`, `products`, `product_batches` (quản lý lô/hạn sử dụng), `product_images`, `product_attributes`.
+* **Order & Checkout:** `orders`, `order_items`.
+
+---
 
 ## 📦 Các Module Đã Hoàn Thiện
 
@@ -32,23 +35,41 @@ Hệ thống cơ sở dữ liệu hiện tại bao gồm các module chính:
 ### 2. Product Catalog (Trưng bày sản phẩm)
 - [x] Lấy cây danh mục sản phẩm (Category Tree).
 - [x] Lấy danh sách sản phẩm (Bán chạy, Mới nhất).
-- [x] **Tìm kiếm & Lọc sản phẩm nâng cao (Search, Sort, Pagination).**
+- [x] **Tìm kiếm & Lọc sản phẩm nâng cao (Omni-Search, Sort, Pagination).**
 - [x] Chi tiết sản phẩm (Gộp thông số, mảng ảnh phụ, tính toán tổng tồn kho realtime từ các lô hàng).
 - [x] Lọc sản phẩm thông minh: Chỉ hiển thị sản phẩm `is_active = true`, tồn kho > 0 và Hạn sử dụng (Expiry Date) > 90 ngày.
 
+### 3. User Profile & Sổ Địa Chỉ (Address Book)
+- [x] CRUD Sổ địa chỉ giao hàng của khách hàng.
+- [x] Xử lý logic Bulk Update bằng `@Transactional` khi thiết lập Địa chỉ Mặc định (`isDefault`).
+- [x] Bảo vệ chống lỗi IDOR (Ngăn chặn user xem/sửa chéo địa chỉ của nhau).
+
+### 4. Order Management (Quản Lý Đơn Hàng)
+- [x] **Luồng Customer:** API tạo đơn hàng mới, dọn dẹp giỏ hàng sau khi đặt.
+- [x] **Luồng Customer:** Xem lịch sử mua hàng (`/me`) và chi tiết luồng theo dõi trạng thái đơn.
+- [x] **Luồng Admin:** Lấy danh sách toàn bộ đơn hàng bằng kỹ thuật Dynamic Query (`Specification` / Criteria API) hỗ trợ lọc đa điều kiện.
+- [x] **Luồng Admin:** Cập nhật tiến trình đơn hàng (`PENDING` -> `PROCESSING` -> `SHIPPING` -> `DELIVERED`).
+
+### 5. Inventory Management (Quản Lý Kho Admin)
+- [x] Bulk Import: API nhập nhiều lô hàng cùng lúc (Product Batches) an toàn với `@Transactional`.
+- [x] Validate nghiệp vụ: Ngày sản xuất bắt buộc phải diễn ra trước Hạn sử dụng.
+- [x] Xem danh sách và lịch sử các lô hàng đã nhập vào hệ thống (Phân trang và tìm kiếm).
+
+---
+
 ## 🚧 Road map (Sắp triển khai)
-- [ ] Module Giỏ hàng (Cart & Cart Items).
-- [ ] Module Khuyến mãi (Voucher / Coupon).
-- [ ] Module Đặt hàng & Thanh toán (Orders & Payment Gateway).
-- [ ] Tích hợp gửi SMS OTP thực tế.
+- [ ] Module Khuyến mãi (Voucher / Coupon system).
+- [ ] Tích hợp Cổng thanh toán Online (VNPay / MoMo).
+- [ ] Dashboard & Báo cáo Thống kê Doanh thu (Admin).
+- [ ] Tích hợp dịch vụ gửi SMS OTP thực tế.
 
 ## 🛠️ Hướng dẫn Setup Local
 
-1.  Clone repository này về máy.
-2.  Tạo database trong MySQL: `CREATE DATABASE ThaiDuongPharmacy;`
-3.  Cấu hình lại username/password database trong file `application-local.properties`.
-4.  Chạy project. Spring Boot sẽ tự động tạo các bảng (DDL Auto) dựa trên Entity.
-5.  Import file script `data.sql` (nếu có) để tạo dữ liệu mẫu.
+1. Clone repository này về máy.
+2. Tạo database trong MySQL: `CREATE DATABASE ThaiDuongPharmacy;`
+3. Cấu hình lại username/password database trong file `application-local.properties`.
+4. Chạy project. Spring Boot sẽ tự động tạo các bảng (DDL Auto) dựa trên Entity.
+5. Import file script `data.sql` (nếu có) để tạo dữ liệu mẫu.
 
 ---
-*Developed with ❤️ by Chung & Team*
+*Developed with ❤️ by Chung*
