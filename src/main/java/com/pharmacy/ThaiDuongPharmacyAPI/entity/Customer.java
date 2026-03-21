@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,12 @@ public class Customer {
 
     @Column(name = "gender")
     private String gender;
+
+    @Column(name = "birthday")
+    private LocalDate birthday;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Column(name = "reward_points")
     private Integer rewardPoints = 0;

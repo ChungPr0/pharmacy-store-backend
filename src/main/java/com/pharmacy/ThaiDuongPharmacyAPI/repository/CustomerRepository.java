@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Customer findByAccount(Account account);
+    boolean existsByEmailAndIdNot(String email, Long id);
 }
