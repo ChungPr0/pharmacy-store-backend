@@ -1,4 +1,4 @@
-package com.pharmacy.ThaiDuongPharmacyAPI.dto.profile;
+package com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

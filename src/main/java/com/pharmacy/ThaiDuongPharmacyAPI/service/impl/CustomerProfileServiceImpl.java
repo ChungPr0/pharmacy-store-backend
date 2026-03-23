@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.CustomerProfileResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.UpdateProfileRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.response.CustomerProfileResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.request.UpdateProfileRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.entity.Customer;
 import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
 import com.pharmacy.ThaiDuongPharmacyAPI.repository.CustomerRepository;

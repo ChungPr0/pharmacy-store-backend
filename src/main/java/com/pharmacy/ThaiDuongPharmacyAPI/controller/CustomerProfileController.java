@@ -1,8 +1,8 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.CustomerProfileResponse;
-import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.UpdateProfileRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.response.CustomerProfileResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.profile.request.UpdateProfileRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.CustomerProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
