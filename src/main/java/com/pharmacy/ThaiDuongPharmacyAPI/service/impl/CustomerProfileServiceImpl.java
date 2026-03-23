@@ -32,14 +32,19 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     public CustomerProfileResponse updateProfile(UpdateProfileRequest request) {
         Customer customer = authUtils.getCurrentCustomer();
 
-        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            if (customerRepository.existsByEmailAndIdNot(request.getEmail(), customer.getId())) {
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            if (customerRepository.existsByEmailAndIdNot(request.getEmail().trim(), customer.getId())) {
                 throw ApiException.badRequest("Email này đã được sử dụng bởi khách hàng khác.");
             }
-            customer.setEmail(request.getEmail());
+            customer.setEmail(request.getEmail().trim());
+        } else {
+            customer.setEmail(null);
         }
 
-        customer.setFullName(request.getFullName());
+        if (request.getFullName() != null) {
+            customer.setFullName(request.getFullName().trim());
+        }
+        
         customer.setGender(request.getGender());
         customer.setBirthday(request.getBirthday());
 
@@ -50,10 +55,19 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     @Override
     @Transactional
     public String updateAvatar(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw ApiException.badRequest("Vui lòng chọn file ảnh hợp lệ.");
+        }
+        
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw ApiException.badRequest("File tải lên phải là định dạng ảnh.");
+        }
+
         Customer customer = authUtils.getCurrentCustomer();
 
         // Simulate a cloud upload
-        String mockUrl = "https://storage.googleapis.com/thaiduong/mock-avatar-" + UUID.randomUUID();
+        String mockUrl = "https://storage.googleapis.com/thaiduong/mock-avatar-" + UUID.randomUUID() + "-" + file.getOriginalFilename();
         
         customer.setAvatarUrl(mockUrl);
         customerRepository.save(customer);
