@@ -43,7 +43,6 @@ public class AuthUtils {
                Customer adminCustomer = new Customer();
                adminCustomer.setAccount(account);
                adminCustomer.setFullName("Admin");
-               adminCustomer.setPhone(account.getPhone());
                return customerRepository.save(adminCustomer);
             }
             throw ApiException.notFound("Thông tin khách hàng không tồn tại");

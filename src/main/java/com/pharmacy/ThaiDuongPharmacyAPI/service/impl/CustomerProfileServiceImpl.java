@@ -81,7 +81,7 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
                 .fullName(customer.getFullName())
                 .avatarUrl(customer.getAvatarUrl())
                 .gender(customer.getGender())
-                .phone(customer.getPhone())
+                .phone(customer.getAccount() != null ? customer.getAccount().getPhone() : null)
                 .email(customer.getEmail())
                 .birthday(customer.getBirthday())
                 .rewardPoints(customer.getRewardPoints())

@@ -150,7 +150,7 @@ public class AuthService {
         Customer newCustomer = getNewCustomer(request);
         customerRepository.save(newCustomer);
 
-        return new RegisterResponse(newCustomer.getPhone());
+        return new RegisterResponse(newCustomer.getAccount().getPhone());
     }
 
     private void sendOtp(String phone, String type) {
@@ -164,7 +164,7 @@ public class AuthService {
         otpRepository.save(otpEntity);
 
         System.out.println("=========================================");
-        System.out.printf("📲 [%s] OTP CỦA %s LÀ: %s%n", type, phone, otpCode);
+        System.out.println("📲 [" + type + "] OTP CỦA " + phone + " LÀ: " + otpCode);
         System.out.println("=========================================");
     }
 
@@ -176,7 +176,6 @@ public class AuthService {
         Customer newCustomer = new Customer();
         newCustomer.setAccount(newAccount);
         newCustomer.setFullName(request.getFullName());
-        newCustomer.setPhone(request.getPhone());
         newCustomer.setEmail(request.getEmail());
         newCustomer.setGender(request.getGender());
         return newCustomer;
