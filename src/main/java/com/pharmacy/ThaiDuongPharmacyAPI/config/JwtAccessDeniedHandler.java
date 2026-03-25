@@ -1,26 +1,33 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.config;
 
-import com.pharmacy.ThaiDuongPharmacyAPI.exception.ApiException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import lombok.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import java.io.IOException;
 
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final HandlerExceptionResolver resolver;
+    private final ObjectMapper objectMapper;
 
-    public JwtAccessDeniedHandler(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
-        this.resolver = resolver;
+    public JwtAccessDeniedHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public void handle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AccessDeniedException accessDeniedException) {
-        resolver.resolveException(request, response, null, ApiException.forbidden("Bạn không có quyền truy cập vào tài nguyên này!"));
+    public void handle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AccessDeniedException accessDeniedException) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        ApiResponse<Object> apiResponse = new ApiResponse<>(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập vào tài nguyên này!", null);
+        objectMapper.writeValue(response.getWriter(), apiResponse);
     }
 }
