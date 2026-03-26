@@ -24,5 +24,5 @@ public class CheckoutRequest {
     private String paymentToken;
 
     @NotEmpty(message = "Danh sách sản phẩm thanh toán không được để trống")
-    private List<Long> cartItemIds;
+    private List<Long> productIds;
 }

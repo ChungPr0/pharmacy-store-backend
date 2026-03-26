@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final AuthUtils authUtils;
+    private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductBatchRepository productBatchRepository;
     private final OrderRepository orderRepository;
@@ -39,16 +40,13 @@ public class OrderServiceImpl implements OrderService {
     public void checkout(CheckoutRequest request) {
         Customer currentCustomer = authUtils.getCurrentCustomer();
 
-        List<CartItem> cartItems = cartItemRepository.findAllById(request.getCartItemIds());
+        Cart cart = cartRepository.findByCustomerId(currentCustomer.getId())
+                .orElseThrow(() -> ApiException.badRequest("Không tìm thấy giỏ hàng của bạn."));
 
-        if (cartItems.isEmpty() || cartItems.size() != request.getCartItemIds().size()) {
-            throw ApiException.badRequest("Một hoặc nhiều sản phẩm trong giỏ hàng không hợp lệ.");
-        }
+        List<CartItem> cartItems = cartItemRepository.findByCartIdAndProductIdIn(cart.getId(), request.getProductIds());
 
-        for (CartItem item : cartItems) {
-            if (!item.getCart().getCustomer().getId().equals(currentCustomer.getId())) {
-                throw ApiException.forbidden("Bạn không có quyền thanh toán sản phẩm này.");
-            }
+        if (cartItems.isEmpty() || cartItems.size() != request.getProductIds().size()) {
+            throw ApiException.badRequest("Một hoặc nhiều sản phẩm không có trong giỏ hàng hoặc không hợp lệ.");
         }
 
         Order order = new Order();
@@ -106,7 +104,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
 
-        cartItemRepository.deleteAllByIdInBatch(request.getCartItemIds());
+        cartItemRepository.deleteAll(cartItems);
     }
 
     @Override
