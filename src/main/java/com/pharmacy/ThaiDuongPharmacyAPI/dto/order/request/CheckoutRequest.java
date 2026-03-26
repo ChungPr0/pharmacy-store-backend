@@ -1,5 +1,6 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.dto.order.request;
 
+import com.pharmacy.ThaiDuongPharmacyAPI.validation.ValidVietnamesePhone;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class CheckoutRequest {
     private String receiverName;
 
     @NotBlank(message = "Số điện thoại không được để trống")
+    @ValidVietnamesePhone
     private String phone;
 
     @NotBlank(message = "Phương thức thanh toán không được để trống")

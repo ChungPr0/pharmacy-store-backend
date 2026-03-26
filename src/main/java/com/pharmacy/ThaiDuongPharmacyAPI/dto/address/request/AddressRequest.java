@@ -1,7 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.dto.address.request;
 
+import com.pharmacy.ThaiDuongPharmacyAPI.validation.ValidVietnamesePhone;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -11,7 +11,7 @@ public class AddressRequest {
     private String receiverName;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Pattern(regexp = "^(0|\\+84)[0-9]{8,9}$", message = "Số điện thoại không hợp lệ")
+    @ValidVietnamesePhone
     private String phoneNumber;
 
     @NotBlank(message = "Tỉnh/Thành phố không được để trống")
