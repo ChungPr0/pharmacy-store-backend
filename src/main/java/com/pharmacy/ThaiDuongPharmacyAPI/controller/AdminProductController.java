@@ -6,14 +6,17 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.AdminProductRequest
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.service.AdminProductService;
+import com.pharmacy.ThaiDuongPharmacyAPI.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -26,6 +29,7 @@ import java.util.Map;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+    private final FileStorageService fileStorageService;
 
     @Operation(summary = "Lấy danh sách sản phẩm", description = "Lấy danh sách sản phẩm có phân trang, có thể lọc theo keyword và categorySlug. Bao gồm tổng số lượng tồn kho.")
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,5 +75,18 @@ public class AdminProductController {
             @PathVariable String slug) {
         adminProductService.toggleProductStatus(slug);
         return ApiResponse.success("Cập nhật trạng thái sản phẩm thành công");
+    }
+
+    @Operation(summary = "Upload ảnh sản phẩm", description = "Upload file ảnh từ thiết bị. Trả về URL của ảnh đã upload.")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/upload-image")
+    public ResponseEntity<ApiResponse<Map<String, String>>> uploadProductImage(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        String relativePath = fileStorageService.storeProductImage(file);
+        // Build full URL: http://localhost:8080/uploads/products/xxx.jpg
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        String fullUrl = baseUrl + relativePath;
+        return ApiResponse.success("Upload ảnh thành công", Map.of("imageUrl", fullUrl));
     }
 }

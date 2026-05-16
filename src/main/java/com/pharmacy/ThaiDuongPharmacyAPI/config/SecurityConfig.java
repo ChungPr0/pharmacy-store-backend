@@ -75,6 +75,9 @@ public class SecurityConfig {
                         // 5. Spring Boot Error Page
                         .requestMatchers("/error").permitAll()
 
+                        // 5.5. Uploaded static files (product images, etc.)
+                        .requestMatchers("/uploads/**").permitAll()
+
                         // 6. Admin APIs (Bảo vệ toàn bộ thư mục admin, bổ sung thêm bảo vệ từ filter nếu cần)
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 

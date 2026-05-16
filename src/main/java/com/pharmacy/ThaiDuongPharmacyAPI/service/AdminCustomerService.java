@@ -1,6 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.AdminCustomerUpdateRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.CustomerRoleUpdateRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.CustomerStatusUpdateRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.response.AdminCustomerResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.PageResponse;
@@ -13,4 +14,6 @@ public interface AdminCustomerService {
     AdminCustomerResponse updateCustomer(Long id, AdminCustomerUpdateRequest request);
 
     void updateCustomerStatus(Long id, CustomerStatusUpdateRequest request);
+
+    void updateCustomerRole(Long id, CustomerRoleUpdateRequest request);
 }

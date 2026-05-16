@@ -29,8 +29,8 @@ public class AdminProductBatchController {
     @PostMapping("/import")
     public ResponseEntity<ApiResponse<Object>> importProductBatches(
             @Valid @RequestBody ProductBatchImportRequest request) {
-        adminProductBatchService.importProductBatches(request);
-        return ApiResponse.success("Nhập hàng thành công");
+        int count = adminProductBatchService.importProductBatches(request);
+        return ApiResponse.success("Nhập kho thành công " + count + " lô hàng.");
     }
 
     @Operation(summary = "Lịch sử nhập hàng", description = "Lấy danh sách các lô hàng đã nhập, có phân trang và có thể lọc theo productId.")
@@ -41,6 +41,6 @@ public class AdminProductBatchController {
             @RequestParam(value = "pageSize", defaultValue = "15", required = false) int pageSize,
             @RequestParam(value = "productId", required = false) Long productId
     ) {
-        return ApiResponse.success("Lấy lịch sử nhập hàng thành công", adminProductBatchService.getProductBatches(pageNo, pageSize, productId));
+        return ApiResponse.success("Lấy lịch sử lô hàng thành công", adminProductBatchService.getProductBatches(pageNo, pageSize, productId));
     }
 }

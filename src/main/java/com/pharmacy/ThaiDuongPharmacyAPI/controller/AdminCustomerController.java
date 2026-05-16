@@ -1,6 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.AdminCustomerUpdateRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.CustomerRoleUpdateRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.CustomerStatusUpdateRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.response.AdminCustomerResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
@@ -66,5 +67,16 @@ public class AdminCustomerController {
         
         adminCustomerService.updateCustomerStatus(id, request);
         return ApiResponse.success("Cập nhật trạng thái tài khoản thành công");
+    }
+
+    @Operation(summary = "Thay Đổi Vai Trò Tài Khoản", description = "Thay đổi vai trò của tài khoản giữa ADMIN và CUSTOMER.")
+    @PatchMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> updateCustomerRole(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerRoleUpdateRequest request) {
+        
+        adminCustomerService.updateCustomerRole(id, request);
+        return ApiResponse.success("Cập nhật vai trò tài khoản thành công");
     }
 }

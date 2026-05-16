@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+
 @Data
 @Entity
 @Table(name = "accounts")
@@ -27,6 +30,10 @@ public class Account {
 
     @Column(name = "status")
     private String status = "ACTIVE";
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

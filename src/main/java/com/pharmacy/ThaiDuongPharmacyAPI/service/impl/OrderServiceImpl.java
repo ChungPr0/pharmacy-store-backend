@@ -133,6 +133,37 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
+    public void cancelMyOrder(String orderCode, String cancelReason) {
+        Long customerId = authUtils.getCurrentCustomerId();
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy đơn hàng với mã: " + orderCode));
+
+        if (!order.getCustomer().getId().equals(customerId)) {
+            throw ApiException.forbidden("Bạn không có quyền hủy đơn hàng này!");
+        }
+
+        if (order.getStatus() != Order.OrderStatus.PENDING && order.getStatus() != Order.OrderStatus.PAID) {
+            throw ApiException.badRequest("Chỉ có thể hủy đơn hàng ở trạng thái \"Chờ xác nhận\" hoặc \"Đã thanh toán\".");
+        }
+
+        // Hoàn trả lại số lượng tồn kho
+        for (OrderItem item : order.getItems()) {
+            List<ProductBatch> batches = productBatchRepository
+                    .findAvailableBatchesByProductIdOrderByExpiryDateAsc(item.getProduct().getId());
+            if (!batches.isEmpty()) {
+                // Hoàn trả vào lô hàng đầu tiên (gần hết hạn nhất)
+                ProductBatch firstBatch = batches.get(0);
+                firstBatch.setStockQuantity(firstBatch.getStockQuantity() + item.getQuantity());
+            }
+        }
+
+        order.setStatus(Order.OrderStatus.CANCELLED);
+        order.setCancelReason(cancelReason);
+        orderRepository.save(order);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public PageResponse<OrderAdminResponse> searchOrders(OrderSearchRequest request) {
         Sort.Direction direction = "asc".equalsIgnoreCase(request.getSortDir()) ? Sort.Direction.ASC : Sort.Direction.DESC;

@@ -5,6 +5,6 @@ import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.request.ProductBatchImportR
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.ProductBatchHistoryResponse;
 
 public interface AdminProductBatchService {
-    void importProductBatches(ProductBatchImportRequest request);
+    int importProductBatches(ProductBatchImportRequest request);
     PageResponse<ProductBatchHistoryResponse> getProductBatches(int pageNo, int pageSize, Long productId);
 }

@@ -1,6 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.service.impl;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.AdminCustomerUpdateRequest;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.CustomerRoleUpdateRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.request.CustomerStatusUpdateRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.admin.response.AdminCustomerResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.PageResponse;
@@ -91,6 +92,25 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
         accountRepository.save(account);
     }
 
+    @Override
+    @Transactional
+    public void updateCustomerRole(Long id, CustomerRoleUpdateRequest request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy khách hàng với ID: " + id));
+
+        Account account = customer.getAccount();
+        if (account == null) {
+            throw ApiException.notFound("Không tìm thấy tài khoản liên kết với khách hàng này.");
+        }
+
+        if (account.getRole() != null && account.getRole().equals(request.getRole())) {
+            throw ApiException.badRequest("Tài khoản đã có vai trò " + request.getRole() + " rồi.");
+        }
+
+        account.setRole(request.getRole());
+        accountRepository.save(account);
+    }
+
     private AdminCustomerResponse mapToResponse(Customer customer) {
         String defaultAddress = customer.getAddresses().stream()
                 .filter(addr -> Boolean.TRUE.equals(addr.getIsDefault()))
@@ -109,8 +129,9 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
                 .phone(customer.getAccount() != null ? customer.getAccount().getPhone() : null)
                 .email(customer.getEmail())
                 .address(defaultAddress)
+                .role(customer.getAccount() != null ? customer.getAccount().getRole() : null)
                 .accountStatus(customer.getAccount() != null ? customer.getAccount().getStatus() : null)
-                .registrationDate(null) // CSDL hiện tại không có entity.createdAt
+                .registrationDate(customer.getAccount() != null ? customer.getAccount().getCreatedAt() : null)
                 .build();
     }
 }
