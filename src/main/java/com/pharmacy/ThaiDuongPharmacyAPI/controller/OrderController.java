@@ -1,6 +1,7 @@
 package com.pharmacy.ThaiDuongPharmacyAPI.controller;
 
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.common.ApiResponse;
+import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.request.CancelOrderRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.request.CheckoutRequest;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderDetailResponse;
 import com.pharmacy.ThaiDuongPharmacyAPI.dto.order.response.OrderHistoryResponse;
@@ -37,6 +38,16 @@ public class OrderController {
     @GetMapping("/me/{orderCode}")
     public ResponseEntity<ApiResponse<OrderDetailResponse>> getMyOrderDetail(@PathVariable String orderCode) {
         return ApiResponse.success("Lấy chi tiết đơn hàng thành công", orderService.getMyOrderDetail(orderCode));
+    }
+
+    @Operation(summary = "Hủy đơn hàng của tôi", description = "Khách hàng tự hủy đơn hàng của mình. Chỉ áp dụng cho đơn hàng ở trạng thái PENDING hoặc PAID.")
+    @PutMapping("/me/{orderCode}/cancel")
+    public ResponseEntity<ApiResponse<Object>> cancelMyOrder(
+            @PathVariable String orderCode,
+            @RequestBody(required = false) CancelOrderRequest request) {
+        String reason = (request != null && request.getCancelReason() != null) ? request.getCancelReason() : "Khách hàng tự hủy đơn";
+        orderService.cancelMyOrder(orderCode, reason);
+        return ApiResponse.success("Hủy đơn hàng thành công!");
     }
 
     @Operation(summary = "Thanh toán (Checkout)", description = "Tạo đơn hàng từ các sản phẩm được chọn trong giỏ hàng, cập nhật tồn kho và làm sạch giỏ.")

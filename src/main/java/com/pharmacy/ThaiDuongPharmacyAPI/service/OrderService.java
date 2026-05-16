@@ -18,6 +18,8 @@ public interface OrderService {
 
     OrderDetailResponse getMyOrderDetail(String orderCode);
 
+    void cancelMyOrder(String orderCode, String cancelReason);
+
     PageResponse<OrderAdminResponse> searchOrders(OrderSearchRequest request);
 
     OrderDetailResponse getAdminOrderDetail(Long id);

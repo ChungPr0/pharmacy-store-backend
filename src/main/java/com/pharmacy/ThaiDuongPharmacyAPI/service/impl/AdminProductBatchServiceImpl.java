@@ -31,16 +31,16 @@ public class AdminProductBatchServiceImpl implements AdminProductBatchService {
 
     @Override
     @Transactional
-    public void importProductBatches(ProductBatchImportRequest request) {
+    public int importProductBatches(ProductBatchImportRequest request) {
         List<ProductBatch> batchesToSave = new ArrayList<>();
 
-        for (ProductBatchItemRequest item : request.getItems()) {
+        for (ProductBatchItemRequest item : request.getBatches()) {
             if (item.getManufactureDate().isAfter(item.getExpiryDate()) || item.getManufactureDate().isEqual(item.getExpiryDate())) {
-                throw ApiException.badRequest("Ngày sản xuất phải trước ngày hết hạn");
+                throw ApiException.badRequest("Ngày sản xuất không được lớn hơn hạn sử dụng (Lô: " + item.getBatchNumber() + ").");
             }
 
             Product product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> ApiException.notFound("Không tìm thấy sản phẩm có id " + item.getProductId()));
+                    .orElseThrow(() -> ApiException.badRequest("Không tìm thấy sản phẩm có ID " + item.getProductId() + " (Lô: " + item.getBatchNumber() + ")."));
 
             ProductBatch batch = new ProductBatch();
             batch.setProduct(product);
@@ -55,6 +55,7 @@ public class AdminProductBatchServiceImpl implements AdminProductBatchService {
         }
 
         productBatchRepository.saveAll(batchesToSave);
+        return batchesToSave.size();
     }
 
     @Override

@@ -67,6 +67,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 if (accountOpt.isPresent()) {
                     Account account = accountOpt.get();
 
+                    if ("BANNED".equals(account.getStatus())) {
+                        exceptionResolver.resolveException(request, response, null, ApiException.forbidden("Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên!"));
+                        return;
+                    }
+
                     List<GrantedAuthority> authorities = new ArrayList<>();
                     String role = account.getRole().startsWith("ROLE_") ? account.getRole() : "ROLE_" + account.getRole();
                     authorities.add(new SimpleGrantedAuthority(role));

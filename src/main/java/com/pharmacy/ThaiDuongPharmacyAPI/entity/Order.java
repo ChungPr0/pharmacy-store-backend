@@ -51,6 +51,9 @@ public class Order {
     @Column(name = "payment_token")
     private String paymentToken;
 
+    @Column(name = "cancel_reason", length = 500)
+    private String cancelReason;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -89,12 +89,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySlug(String slug);
 
     @Query("SELECT new com.pharmacy.ThaiDuongPharmacyAPI.dto.product.response.AdminProductListResponse(" +
-           "p.id, p.name, p.slug, p.category.name, p.price, p.isActive, COALESCE(SUM(pb.stockQuantity), 0L)) " +
+           "p.id, p.name, p.slug, p.imageUrl, p.category.name, p.price, p.isActive, COALESCE(SUM(pb.stockQuantity), 0L)) " +
            "FROM Product p " +
            "LEFT JOIN p.batches pb " +
            "WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
            "AND (:categorySlug IS NULL OR :categorySlug = '' OR p.category.slug = :categorySlug) " +
-           "GROUP BY p.id, p.name, p.slug, p.category.name, p.price, p.isActive")
+           "GROUP BY p.id, p.name, p.slug, p.imageUrl, p.category.name, p.price, p.isActive")
     Page<AdminProductListResponse> getAdminProductList(
             @Param("keyword") String keyword,
             @Param("categorySlug") String categorySlug,

@@ -12,5 +12,5 @@ public class ProductBatchImportRequest {
 
     @NotEmpty(message = "Danh sách lô hàng không được để trống")
     @Valid
-    private List<ProductBatchItemRequest> items;
+    private List<ProductBatchItemRequest> batches;
 }

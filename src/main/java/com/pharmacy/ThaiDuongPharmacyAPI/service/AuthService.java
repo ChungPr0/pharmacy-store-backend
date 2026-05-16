@@ -41,6 +41,10 @@ public class AuthService {
         Account account = accountRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> ApiException.unauthorized("Số điện thoại hoặc mật khẩu không chính xác!"));
 
+        if ("BANNED".equals(account.getStatus())) {
+            throw ApiException.forbidden("Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên!");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
             throw ApiException.unauthorized("Số điện thoại hoặc mật khẩu không chính xác!");
         }
@@ -65,6 +69,10 @@ public class AuthService {
         Account account = accountRepository.findByPhone(currentPhone)
                 .orElseThrow(() -> ApiException.notFound("Không tìm thấy tài khoản!"));
 
+        if ("BANNED".equals(account.getStatus())) {
+            throw ApiException.forbidden("Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên!");
+        }
+
         if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
             throw ApiException.badRequest("Mật khẩu hiện tại không chính xác!");
         }
@@ -85,10 +93,13 @@ public class AuthService {
     }
 
     public OtpResponse forgotPasswordRequestOtp(ForgotPasswordRequest request) {
-        if (!accountRepository.existsByPhone(request.getPhone())) {
-            throw ApiException.notFound("Số điện thoại này chưa được đăng ký!");
-        }
+        Account account = accountRepository.findByPhone(request.getPhone())
+                .orElseThrow(() -> ApiException.notFound("Số điện thoại này chưa được đăng ký!"));
         
+        if ("BANNED".equals(account.getStatus())) {
+            throw ApiException.forbidden("Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên!");
+        }
+
         sendOtp(request.getPhone(), "FORGOT PASSWORD");
         return new OtpResponse(request.getPhone(), OTP_EXPIRATION_SECONDS);
     }
@@ -112,6 +123,10 @@ public class AuthService {
 
         Account account = accountRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> ApiException.notFound("Tài khoản không tồn tại!"));
+
+        if ("BANNED".equals(account.getStatus())) {
+            throw ApiException.forbidden("Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên!");
+        }
 
         account.setPreviousPassword(account.getPassword());
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -204,6 +219,9 @@ public class AuthService {
         }
 
         Account account = refreshToken.getAccount();
+        if ("BANNED".equals(account.getStatus())) {
+            throw ApiException.forbidden("Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên!");
+        }
         String newAccessToken = jwtUtils.generateToken(account.getPhone());
 
         return new TokenRefreshResponse(newAccessToken, refreshToken.getToken(), "Bearer");
